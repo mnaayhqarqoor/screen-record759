@@ -7,15 +7,17 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23ff4b3e' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ff4b3e'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
-   REC·STUDIO — نظام التصميم
-   هوية: غرفة بث داكنة · أحمر تسجيل كإشارة قيادة · كهرماني للتمييز
+   REC·STUDIO — نسخة خفيفة للأجهزة الضعيفة
+   · خلفيات صلبة صريحة لكل مشهد (إصلاح الشفافية)
+   · لا backdrop-filter · لا ظلال ثقيلة · حركات مقتصدة
+   · وضع perf-light تلقائي للأجهزة الضعيفة
    ================================================================ */
 :root{
   --bg:#0b0d11;
-  --bg-dots:#151a21;
+  --bg-dots:#161b23;
   --panel:#10131a;
   --panel-2:#141821;
   --panel-3:#181d27;
@@ -25,7 +27,6 @@
   --ink-2:#aab3c2;
   --ink-3:#7d8798;
   --red:#ff4b3e;
-  --red-deep:#c92c22;
   --amber:#ffb224;
   --green:#3dd68c;
   --blue:#4cb3ff;
@@ -35,22 +36,26 @@
   --r-sm:6px;
   --r-md:10px;
   --r-lg:14px;
-  --shadow-pop:0 18px 50px rgba(0,0,0,.55);
+  --shadow-pop:0 8px 24px rgba(0,0,0,.45);
 }
+/* الوضع الخفيف: بلا نقاط، بلا ظلال، بلا هالات */
+body.perf-light{--shadow-pop:none}
+body.perf-light .bg-dots{display:none}
+body.perf-light .rec-btn::after{display:none}
+body.perf-light .toast{box-shadow:none}
+
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;background:var(--bg)}
 body{
   font-family:var(--font);
-  background:var(--bg);
-  background-image:radial-gradient(var(--bg-dots) 1px, transparent 1px);
-  background-size:22px 22px;
   color:var(--ink);
   overflow:hidden;
   font-size:14px;
   line-height:1.6;
+  -webkit-font-smoothing:antialiased;
 }
 ::selection{background:var(--red);color:#fff}
-button,input,select,textarea{font-family:inherit;color:inherit}
+button,input,select{font-family:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none;user-select:none}
 button:disabled{cursor:not-allowed;opacity:.38}
 svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -59,12 +64,15 @@ svg.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-wid
 ::-webkit-scrollbar-thumb{background:#2a323e;border-radius:8px;border:2px solid var(--bg)}
 ::-webkit-scrollbar-thumb:hover{background:#39424f}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 
 /* ============ هيكل التطبيق ============ */
 #app{display:flex;height:100vh;overflow:hidden}
-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg)}
 
-/* ============ الشريط الجانبي (راك التنقل) ============ */
+/* ============ الشريط الجانبي ============ */
 .sidebar{
   width:86px;flex:none;
   background:var(--panel);
@@ -76,21 +84,18 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .brand-mark{
   width:44px;height:44px;border-radius:50%;
   border:2px solid var(--red);
-  display:grid;place-items:center;margin-bottom:14px;
-  position:relative;flex:none;
+  display:grid;place-items:center;margin-bottom:14px;flex:none;
 }
-.brand-mark::after{
-  content:'';width:16px;height:16px;border-radius:50%;background:var(--red);
-}
-.brand-mark.pulse::after{animation:brandPulse 1.1s ease infinite}
+.brand-mark::after{content:'';width:16px;height:16px;border-radius:50%;background:var(--red)}
+.brand-mark.pulse::after{animation:brandPulse 1.1s steps(2) infinite}
 @keyframes brandPulse{50%{opacity:.35}}
 .nav-btn{
   width:66px;padding:9px 0 7px;border-radius:var(--r-sm);
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:var(--ink-3);transition:.16s;
+  color:var(--ink-3);transition:background .12s,color .12s;
   border:1px solid transparent;
 }
-.nav-btn span{font-size:10.5px;font-weight:500;letter-spacing:.02em}
+.nav-btn span{font-size:10.5px;font-weight:500}
 .nav-btn:hover{color:var(--ink);background:var(--panel-2)}
 .nav-btn.on{
   color:var(--ink);background:var(--panel-3);
@@ -100,18 +105,15 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .nav-sep{width:46px;height:1px;background:var(--line-soft);margin:8px 0;flex:none}
 .side-status{
   margin-top:auto;display:flex;flex-direction:column;gap:8px;
-  padding-top:12px;border-top:1px solid var(--line-soft);width:46px;
+  padding-top:12px;border-top:1px solid var(--line-soft);width:52px;
 }
 .led{
   display:flex;align-items:center;gap:7px;
   font:600 9px var(--mono);letter-spacing:.08em;color:var(--ink-3);
 }
-.led i{
-  width:8px;height:8px;border-radius:50%;flex:none;
-  background:#242b36;transition:.2s;
-}
+.led i{width:8px;height:8px;border-radius:50%;flex:none;background:#242b36;transition:background .2s}
 .led.on{color:var(--ink-2)}
-.led.on.rec i{background:var(--red);box-shadow:0 0 0 3px rgba(255,75,62,.18)}
+.led.on.rec i{background:var(--red)}
 .led.on.mic i{background:var(--green)}
 .led.on.cam i{background:var(--amber)}
 .led.on.sys i{background:var(--blue)}
@@ -124,9 +126,7 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 }
 .tb-title{display:flex;align-items:baseline;gap:10px;min-width:0}
 .tb-title h1{font-size:17px;font-weight:700;white-space:nowrap}
-.tb-title code{
-  font:500 10.5px var(--mono);color:var(--ink-3);letter-spacing:.14em;
-}
+.tb-title code{font:500 10.5px var(--mono);color:var(--ink-3);letter-spacing:.14em}
 .state-badge{
   display:inline-flex;align-items:center;gap:8px;
   font:600 10.5px var(--mono);letter-spacing:.1em;
@@ -135,14 +135,11 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 }
 .state-badge i{width:8px;height:8px;border-radius:50%;background:#39424f}
 .state-badge.rec{color:var(--red);border-color:rgba(255,75,62,.45)}
-.state-badge.rec i{background:var(--red);animation:brandPulse 1s infinite}
+.state-badge.rec i{background:var(--red);animation:brandPulse 1s steps(2) infinite}
 .state-badge.paused{color:var(--amber);border-color:rgba(255,178,36,.4)}
 .state-badge.paused i{background:var(--amber)}
-.tb-clock{
-  margin-inline-start:auto;direction:ltr;text-align:left;
-  font:600 15px var(--mono);letter-spacing:.04em;
-}
-.tb-clock small{display:block;font:400 10.5px var(--mono);color:var(--ink-3);letter-spacing:.02em}
+.tb-clock{margin-inline-start:auto;direction:ltr;text-align:left;font:600 15px var(--mono)}
+.tb-clock small{display:block;font:400 10.5px var(--mono);color:var(--ink-3)}
 .support-badge{
   font:500 10px var(--mono);color:var(--green);
   border:1px solid rgba(61,214,140,.35);border-radius:99px;
@@ -150,18 +147,27 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 }
 .support-badge.bad{color:var(--red);border-color:rgba(255,75,62,.4)}
 
-/* ============ حاوية المشاهد ============ */
-.views{flex:1;overflow:hidden;position:relative}
-.view{position:absolute;inset:0;overflow-y:auto;padding:22px;display:none}
-.view.on{display:block}
-@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.view.on{animation:viewIn .28s ease}
-
-/* ============ وحدات الراك (المقاطع) ============ */
-.module{
-  background:var(--panel);border:1px solid var(--line);
-  border-radius:var(--r-lg);overflow:hidden;
+/* ═══════════════════════════════════════════════════
+   الإصلاح الجوهري: الخلفية الصلبة لمنطقة المشاهد
+   كل مشهد (مكتبة/محرر/إعدادات) يقف فوق خلفية صلبة
+   مؤكدة — لا شفافية نهائياً مهما كان المتصفح.
+   ═══════════════════════════════════════════════════ */
+.views{
+  flex:1;overflow:hidden;position:relative;
+  background:var(--bg);                 /* الطبقة الصلبة */
 }
+.bg-dots{                                /* نمط النقاط فوق الصلبة فقط */
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(var(--bg-dots) 1px, transparent 1px);
+  background-size:22px 22px;
+}
+.views > .view{z-index:1}                /* المشاهد فوق النقاط */
+.view{position:absolute;inset:0;overflow-y:auto;padding:22px;display:none}
+.view.on{display:block;animation:viewIn .18s ease}
+@keyframes viewIn{from{opacity:0}to{opacity:1}}
+
+/* ============ وحدات الراك ============ */
+.module{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
 .module-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 16px;border-bottom:1px solid var(--line-soft);
@@ -171,33 +177,25 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .module-head code{font:500 9.5px var(--mono);letter-spacing:.16em;color:var(--ink-3)}
 .module-body{padding:14px 16px}
 
-/* ============ التخطيط الرئيسي للاستوديو ============ */
-#view-studio{display:flex;gap:18px;align-items:flex-start;max-width:1560px;margin:0 auto}
+/* ============ تخطيط الاستوديو ============ */
+#view-studio{display:flex;gap:18px;align-items:flex-start;max-width:1560px;margin:0 auto;width:100%}
 .studio-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
 .rack{width:318px;flex:none;display:flex;flex-direction:column;gap:14px}
 
-/* ============ الشاشة (المرقب) ============ */
-.monitor{
-  background:var(--panel);border:1px solid var(--line);
-  border-radius:var(--r-lg);overflow:hidden;position:relative;
-}
-.monitor::before{
-  content:'';position:absolute;top:0;right:0;left:0;height:2px;
-  background:var(--line);z-index:2;transition:.3s;
-}
+/* ============ المرقب ============ */
+.monitor{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;position:relative}
+.monitor::before{content:'';position:absolute;top:0;right:0;left:0;height:2px;background:var(--line);z-index:2}
 body.is-recording .monitor::before{background:var(--red)}
+body.perf-light .monitor::before{display:none}
 .mon-top{
   height:42px;display:flex;align-items:center;gap:10px;
   padding:0 14px;border-bottom:1px solid var(--line-soft);
   background:var(--panel-2);
 }
-.rec-lamp{
-  display:flex;align-items:center;gap:7px;
-  font:600 10px var(--mono);letter-spacing:.12em;color:var(--ink-3);direction:ltr;
-}
+.rec-lamp{display:flex;align-items:center;gap:7px;font:600 10px var(--mono);letter-spacing:.12em;color:var(--ink-3);direction:ltr}
 .rec-lamp i{width:9px;height:9px;border-radius:50%;background:#2a323e}
 body.is-recording .rec-lamp{color:var(--red)}
-body.is-recording .rec-lamp i{background:var(--red);animation:brandPulse 1s infinite}
+body.is-recording .rec-lamp i{background:var(--red);animation:brandPulse 1s steps(2) infinite}
 body.is-paused .rec-lamp{color:var(--amber)}
 body.is-paused .rec-lamp i{background:var(--amber)}
 .chip{
@@ -210,20 +208,16 @@ body.is-paused .rec-lamp i{background:var(--amber)}
 .icon-btn{
   width:32px;height:32px;border-radius:var(--r-sm);
   display:grid;place-items:center;color:var(--ink-3);
-  border:1px solid transparent;transition:.15s;
+  border:1px solid transparent;transition:background .12s,color .12s;
 }
 .icon-btn:hover{color:var(--ink);background:var(--panel-3);border-color:var(--line)}
-.stage-wrap{
-  position:relative;background:#000;
-  aspect-ratio:16/9;max-height:calc(100vh - 320px);min-height:340px;
-}
-.stage-wrap video,canvas#stage{display:block;width:100%;height:100%}
-canvas#stage{background:#000}
-/* صندوق التحكم بكاميرا PiP (لا يُسجَّل — خارج الـ canvas) */
+.stage-wrap{position:relative;background:#000;aspect-ratio:16/9;max-height:calc(100vh - 320px);min-height:340px}
+canvas#stage{display:block;width:100%;height:100%;background:#000}
+
+/* صندوق PiP (خارج التسجيل) */
 .pip-box{
   position:absolute;border:1.5px dashed rgba(255,178,36,.85);
   border-radius:8px;cursor:grab;touch-action:none;
-  background:rgba(20,24,33,.14);
 }
 .pip-box:active{cursor:grabbing}
 .pip-box .pip-tag{
@@ -237,29 +231,24 @@ canvas#stage{background:#000}
   border:2px solid #0b0d11;
 }
 body.is-recording .pip-box{opacity:0;pointer-events:none}
-/* غطاء العدّ التنازلي */
+
+/* غطاء العدّ التنازلي — بلا blur */
 .cd-ov{
   position:absolute;inset:0;z-index:5;display:none;
-  background:rgba(8,10,14,.86);backdrop-filter:blur(3px);
+  background:rgba(8,10,14,.92);
   flex-direction:column;align-items:center;justify-content:center;gap:8px;
 }
 .cd-ov.on{display:flex}
-.cd-ov .cd-num{
-  font:600 140px/1 var(--mono);letter-spacing:-.04em;
-  color:var(--ink);font-variant-numeric:tabular-nums;
-}
+.cd-ov .cd-num{font:600 140px/1 var(--mono);letter-spacing:-.04em;color:var(--ink);font-variant-numeric:tabular-nums}
 .cd-ov .cd-ring{position:relative;width:170px;height:170px;margin-top:-160px;pointer-events:none}
 .cd-ov .cd-ring svg{transform:rotate(-90deg)}
 .cd-ov .cd-ring circle{fill:none;stroke-width:3}
 .cd-ov .cd-ring .bgc{stroke:#242b36}
 .cd-ov .cd-ring .fgc{stroke:var(--red);stroke-dasharray:471;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear}
 .cd-ov .cd-label{font:600 12px var(--mono);letter-spacing:.28em;color:var(--ink-3);direction:ltr}
-.cd-cancel{
-  margin-top:16px;font:500 12px var(--font);
-  padding:8px 20px;border:1px solid var(--line);border-radius:99px;color:var(--ink-2);
-}
+.cd-cancel{margin-top:16px;font:500 12px var(--font);padding:8px 20px;border:1px solid var(--line);border-radius:99px;color:var(--ink-2)}
 .cd-cancel:hover{color:var(--red);border-color:rgba(255,75,62,.5)}
-/* شريط أسفل الشاشة */
+
 .mon-bottom{
   height:44px;display:flex;align-items:center;gap:12px;
   padding:0 14px;border-top:1px solid var(--line-soft);
@@ -272,8 +261,9 @@ body.is-recording .pip-box{opacity:0;pointer-events:none}
   color:var(--ink-2);
 }
 .file-name:focus{outline:none;border-color:var(--amber);color:var(--ink)}
+.file-name:disabled{opacity:.6}
 
-/* ============ شريط النقل (transport) ============ */
+/* ============ شريط النقل ============ */
 .transport{
   height:88px;flex:none;display:flex;align-items:center;gap:18px;
   background:var(--panel);border:1px solid var(--line);
@@ -281,19 +271,13 @@ body.is-recording .pip-box{opacity:0;pointer-events:none}
 }
 .tp-group{display:flex;align-items:center;gap:10px}
 .tp-sep{width:1px;height:44px;background:var(--line-soft);flex:none}
-/* زر REC — القطعة المركزية */
 .rec-btn{
   width:64px;height:64px;border-radius:50%;flex:none;position:relative;
   background:var(--panel-3);border:1.5px solid var(--line);
-  display:grid;place-items:center;transition:.18s;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  display:grid;place-items:center;transition:border-color .15s;
 }
-.rec-btn .rec-core{
-  width:26px;height:26px;border-radius:50%;background:var(--red);
-  transition:.22s cubic-bezier(.6,1.6,.4,1);
-}
+.rec-btn .rec-core{width:26px;height:26px;border-radius:50%;background:var(--red);transition:.2s}
 .rec-btn:hover{border-color:rgba(255,75,62,.6)}
-.rec-btn:hover .rec-core{transform:scale(1.12)}
 body.is-recording .rec-btn .rec-core{border-radius:5px;width:22px;height:22px}
 body.is-recording .rec-btn{border-color:var(--red)}
 .rec-btn::after{
@@ -301,29 +285,22 @@ body.is-recording .rec-btn{border-color:var(--red)}
   border:1.5px solid var(--red);opacity:0;pointer-events:none;
 }
 body.is-recording .rec-btn::after{animation:recHalo 1.6s ease-out infinite}
-@keyframes recHalo{
-  0%{opacity:.7;transform:scale(1)}
-  100%{opacity:0;transform:scale(1.55)}
-}
-/* العدّاد */
+@keyframes recHalo{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.55)}}
 .tp-timer{
-  direction:ltr;font:600 30px var(--mono);letter-spacing:.02em;
+  direction:ltr;font:600 30px var(--mono);
   font-variant-numeric:tabular-nums;min-width:196px;text-align:center;
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
 .tp-timer .dot{color:var(--red);font-size:26px;line-height:1}
 body.is-recording .tp-timer .dot{animation:brandPulse 1s steps(2) infinite}
 body.is-paused .tp-timer{color:var(--amber)}
-body.is-paused .tp-timer .dot{animation:none;opacity:1}
-.tp-stat{
-  display:flex;flex-direction:column;gap:2px;min-width:86px;
-}
+.tp-stat{display:flex;flex-direction:column;gap:2px;min-width:86px}
 .tp-stat b{font:600 13px var(--mono);direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
 .tp-stat span{font:500 9px var(--mono);letter-spacing:.14em;color:var(--ink-3);direction:ltr;text-align:right}
 .t-btn{
   width:44px;height:44px;border-radius:var(--r-md);flex:none;
   display:grid;place-items:center;color:var(--ink-2);
-  border:1px solid var(--line);background:var(--panel-2);transition:.15s;
+  border:1px solid var(--line);background:var(--panel-2);transition:background .12s,color .12s;
   position:relative;
 }
 .t-btn:hover{color:var(--ink);border-color:#39424f;background:var(--panel-3)}
@@ -334,28 +311,26 @@ body.is-paused .tp-timer .dot{animation:none;opacity:1}
   border-radius:99px;padding:1px 6px;direction:ltr;
 }
 
-/* ============ صفوف الصوت في الراك ============ */
+/* ============ صفوف الصوت ============ */
 .a-row{display:flex;gap:12px;align-items:stretch;padding:10px 0}
 .a-row + .a-row{border-top:1px solid var(--line-soft)}
 .a-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center}
 .a-head{display:flex;align-items:center;gap:8px}
 .a-head b{font-size:12.5px;font-weight:600}
-.a-head .a-led{width:7px;height:7px;border-radius:50%;background:#242b36;flex:none}
+.a-head .a-led{width:7px;height:7px;border-radius:50%;background:#242b36;flex:none;transition:background .2s}
 .a-head .a-led.on{background:var(--green)}
 .a-head .mute-btn{
   margin-inline-start:auto;width:26px;height:26px;border-radius:6px;
   display:grid;place-items:center;color:var(--ink-3);border:1px solid transparent;
 }
 .a-head .mute-btn:hover{color:var(--ink);border-color:var(--line)}
-.a-head .mute-btn.muted{color:var(--red);border-color:rgba(255,75,62,.45);background:rgba(255,75,62,.08)}
+.a-head .mute-btn.muted{color:var(--red);border-color:rgba(255,75,62,.45)}
 .a-head .power-btn{
   font:600 10px var(--mono);letter-spacing:.06em;
   border:1px solid var(--line);border-radius:99px;padding:3px 11px;
-  color:var(--ink-3);direction:ltr;transition:.15s;
+  color:var(--ink-3);direction:ltr;transition:color .12s;
 }
-.a-head .power-btn:hover{color:var(--ink);border-color:#39424f}
 .a-head .power-btn.on{color:var(--green);border-color:rgba(61,214,140,.5)}
-/* الفيدر (المنزلق) */
 .fader{position:relative;height:26px;display:flex;align-items:center}
 .fader input[type=range]{
   -webkit-appearance:none;appearance:none;width:100%;height:4px;
@@ -363,32 +338,26 @@ body.is-paused .tp-timer .dot{animation:none;opacity:1}
 }
 .fader input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;width:14px;height:22px;border-radius:5px;
-  background:linear-gradient(#39424f,#232a35);
-  border:1px solid #4a5462;box-shadow:0 2px 5px rgba(0,0,0,.5);
-  cursor:ew-resize;
+  background:#39424f;border:1px solid #4a5462;cursor:ew-resize;
 }
 .fader input[type=range]::-moz-range-thumb{
   width:14px;height:22px;border-radius:5px;background:#39424f;
   border:1px solid #4a5462;cursor:ew-resize;
 }
-.fader input[type=range]::-moz-range-progress{background:var(--red);height:4px;border-radius:4px}
-.fader .db{
-  font:500 10px var(--mono);color:var(--ink-3);direction:ltr;
-  position:absolute;inset-inline-end:0;top:-16px;
-}
-/* مقياس VU عمودي */
+.fader .db{font:500 10px var(--mono);color:var(--ink-3);direction:ltr;position:absolute;inset-inline-end:0;top:-16px}
+/* مقياس VU: 12 قطعة فقط (كان 18) */
 .vu{
   width:26px;height:118px;flex:none;
   display:flex;flex-direction:column-reverse;gap:3px;
   padding:6px 5px;border:1px solid var(--line-soft);border-radius:7px;
   background:var(--bg);direction:ltr;
 }
-.vu i{flex:1;border-radius:2px;background:#1a2029;transition:background .05s}
+.vu i{flex:1;border-radius:2px;background:#1a2029}
 .vu i.lit.g{background:var(--green)}
 .vu i.lit.y{background:var(--amber)}
 .vu i.lit.r{background:var(--red)}
 
-/* ============ عناصر النماذج ============ */
+/* ============ النماذج ============ */
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .field:last-child{margin-bottom:0}
 .field > label{font-size:11.5px;font-weight:600;color:var(--ink-2)}
@@ -401,40 +370,38 @@ select,input[type=text]{
 }
 select:focus,input[type=text]:focus{outline:none;border-color:var(--amber)}
 select option{background:var(--panel-2)}
+.flabel{font-size:11.5px;font-weight:600;color:var(--ink-3)}
 .seg{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
 .seg button{
   flex:1;padding:7px 4px;font:600 11px var(--mono);direction:ltr;
-  color:var(--ink-3);background:var(--panel-2);transition:.14s;
+  color:var(--ink-3);background:var(--panel-2);transition:background .12s,color .12s;
   border-inline-start:1px solid var(--line);
 }
 .seg button:first-child{border-inline-start:none}
 .seg button:hover{color:var(--ink)}
 .seg button.on{color:var(--ink);background:var(--panel-3);box-shadow:inset 0 -2px 0 var(--red)}
-/* مفتاح التبديل */
 .switch{display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;user-select:none}
 .switch + .switch{border-top:1px solid var(--line-soft)}
 .switch input{display:none}
-.switch .sw-track{
+.sw-track{
   width:40px;height:22px;border-radius:99px;flex:none;
-  background:var(--track);border:1px solid var(--line);position:relative;transition:.2s;
+  background:var(--track);border:1px solid var(--line);position:relative;transition:background .15s;
 }
-.switch .sw-track::after{
+.sw-track::after{
   content:'';position:absolute;top:2px;inset-inline-start:2px;
-  width:16px;height:16px;border-radius:50%;background:#7d8798;transition:.2s;
+  width:16px;height:16px;border-radius:50%;background:#7d8798;transition:inset-inline-start .15s;
 }
 .switch input:checked + .sw-track{background:rgba(255,75,62,.22);border-color:rgba(255,75,62,.5)}
-.switch input:checked + .sw-track::after{
-  background:var(--red);inset-inline-start:20px;
-}
-.switch .sw-txt{flex:1;min-width:0}
-.switch .sw-txt b{display:block;font-size:12.5px;font-weight:600}
-.switch .sw-txt small{display:block;font-size:11px;color:var(--ink-3);line-height:1.45}
+.switch input:checked + .sw-track::after{background:var(--red);inset-inline-start:20px}
+.sw-txt{flex:1;min-width:0}
+.sw-txt b{display:block;font-size:12.5px;font-weight:600}
+.sw-txt small{display:block;font-size:11px;color:var(--ink-3);line-height:1.45}
 
-/* ============ الأزرار العامة ============ */
+/* ============ أزرار ============ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:9px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;
-  border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:.15s;
+  border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:background .12s;
 }
 .btn:hover{background:var(--panel-3);border-color:#39424f}
 .btn.primary{background:var(--red);border-color:var(--red);color:#fff}
@@ -443,10 +410,9 @@ select option{background:var(--panel-2)}
 .btn.ghost-red:hover{background:rgba(255,75,62,.1)}
 .btn.ghost-amber{color:var(--amber);border-color:rgba(255,178,36,.45)}
 .btn.ghost-amber:hover{background:rgba(255,178,36,.08)}
-.btn:disabled{opacity:.35}
 
 /* ============ المكتبة ============ */
-#view-library{max-width:1160px;margin:0 auto}
+#view-library{max-width:1160px;margin:0 auto;width:100%}
 .lib-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
 .lib-head h2{font-size:19px;font-weight:700}
 .lib-head .lib-sub{font:500 11px var(--mono);letter-spacing:.14em;color:var(--ink-3)}
@@ -462,11 +428,11 @@ select option{background:var(--panel-2)}
 .lib-row{
   display:flex;align-items:center;gap:16px;
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:10px 14px;cursor:pointer;transition:.15s;
+  padding:10px 14px;cursor:pointer;transition:border-color .12s,background .12s;
 }
-.lib-row:hover{border-color:#39424f;background:var(--panel-2);transform:translateX(-2px)}
+.lib-row:hover{border-color:#39424f;background:var(--panel-2)}
 .lib-thumb{
-  width:150px;height:84px;border-radius:7px;flex:none;overflow:hidden;
+  width:140px;height:79px;border-radius:7px;flex:none;overflow:hidden;
   background:#000;border:1px solid var(--line-soft);position:relative;
 }
 .lib-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -484,19 +450,13 @@ select option{background:var(--panel-2)}
   border:1px dashed var(--line);border-radius:var(--r-md);
   font:500 11.5px var(--mono);color:var(--ink-3);direction:ltr;justify-content:space-between;
 }
-.lib-empty{
-  padding:70px 20px;text-align:center;border:1px dashed var(--line);
-  border-radius:var(--r-lg);color:var(--ink-3);
-}
+.lib-empty{padding:70px 20px;text-align:center;border:1px dashed var(--line);border-radius:var(--r-lg);color:var(--ink-3)}
 .lib-empty svg{width:52px;height:52px;stroke-width:1.2;margin-bottom:14px;opacity:.7}
 .lib-empty p{margin-bottom:18px;font-size:13.5px}
 
 /* ============ المحرر ============ */
-#view-editor{max-width:1240px;margin:0 auto}
-.ed-empty{
-  padding:90px 20px;text-align:center;border:1px dashed var(--line);
-  border-radius:var(--r-lg);color:var(--ink-3);
-}
+#view-editor{max-width:1240px;margin:0 auto;width:100%}
+.ed-empty{padding:90px 20px;text-align:center;border:1px dashed var(--line);border-radius:var(--r-lg);color:var(--ink-3)}
 .ed-empty svg{width:52px;height:52px;stroke-width:1.2;margin-bottom:14px;opacity:.7}
 .ed-empty p{margin-bottom:18px}
 #edWrap{display:flex;flex-direction:column;gap:14px}
@@ -505,16 +465,12 @@ select option{background:var(--panel-2)}
 .ed-rack{width:300px;flex:none;display:flex;flex-direction:column;gap:14px}
 #edVideo{display:block;width:100%;height:100%;background:#000}
 .ed-transport{
-  height:64px;display:flex;align-items:center;gap:14px;
+  height:64px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:0 16px;
+  padding:8px 16px;
 }
-.ed-time{
-  font:600 14px var(--mono);direction:ltr;font-variant-numeric:tabular-nums;
-  color:var(--ink-2);margin-inline-start:auto;white-space:nowrap;
-}
+.ed-time{font:600 14px var(--mono);direction:ltr;font-variant-numeric:tabular-nums;color:var(--ink-2);margin-inline-start:auto;white-space:nowrap}
 .ed-time b{color:var(--ink)}
-.ed-meta-list{display:flex;flex-direction:column;gap:0}
 .ed-meta-list .mi{
   display:flex;justify-content:space-between;align-items:center;
   padding:7px 0;border-top:1px solid var(--line-soft);font-size:12px;
@@ -536,7 +492,7 @@ select option{background:var(--panel-2)}
 .tl-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .tl-head b{font-size:12.5px;font-weight:600}
 .tl-head code{font:500 9.5px var(--mono);letter-spacing:.16em;color:var(--ink-3)}
-.tl-head .tl-zoom{margin-inline-start:auto;font:500 10.5px var(--mono);color:var(--ink-3);direction:ltr}
+.tl-head .tl-zoom{margin-inline-start:auto;font:500 10.5px var(--mono);color:var(--ink-3);direction:ltr;font-variant-numeric:tabular-nums}
 .tl-body{position:relative;height:64px;direction:ltr;touch-action:none}
 #tlCanvas{position:absolute;inset:0;width:100%;height:100%;border-radius:6px;cursor:crosshair}
 .tl-fill{
@@ -547,44 +503,35 @@ select option{background:var(--panel-2)}
 .tl-mask{position:absolute;top:0;bottom:0;background:rgba(8,10,14,.66);pointer-events:none}
 #tlMaskA{left:0}
 #tlMaskB{right:0}
-.tl-handle{
-  position:absolute;top:-7px;bottom:-7px;width:12px;margin-left:-6px;
-  cursor:ew-resize;z-index:4;
-}
-.tl-handle::before{
-  content:'';position:absolute;top:0;bottom:0;left:5px;width:2px;background:var(--amber);
-}
+.tl-handle{position:absolute;top:-7px;bottom:-7px;width:12px;margin-left:-6px;cursor:ew-resize;z-index:4}
+.tl-handle::before{content:'';position:absolute;top:0;bottom:0;left:5px;width:2px;background:var(--amber)}
 .tl-handle::after{
   content:'';position:absolute;top:0;left:-3px;width:18px;height:14px;
   background:var(--amber);border-radius:3px 3px 0 0;
   clip-path:polygon(0 0,100% 0,100% 100%,50% 55%,0 100%);
 }
-.tl-handle:hover::after{background:var(--ink)}
 .tl-mark{
   position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
   background:var(--blue);transform:rotate(45deg);cursor:pointer;z-index:3;
-  border:1.5px solid var(--panel);transition:.12s;
+  border:1.5px solid var(--panel);
 }
-.tl-mark:hover{transform:rotate(45deg) scale(1.35);background:var(--ink)}
+.tl-mark:hover{background:var(--ink)}
 .tl-hover-tip{
   position:absolute;top:-26px;transform:translateX(-50%);
   font:600 10px var(--mono);background:var(--panel-3);color:var(--ink);
   border:1px solid var(--line);border-radius:4px;padding:2px 7px;
   pointer-events:none;white-space:nowrap;display:none;z-index:6;
 }
-.tl-ruler{
-  display:flex;justify-content:space-between;margin-top:8px;
-  font:500 9.5px var(--mono);color:var(--ink-3);direction:ltr;
-}
+.tl-ruler{display:flex;justify-content:space-between;margin-top:8px;font:500 9.5px var(--mono);color:var(--ink-3);direction:ltr}
 
 /* ============ الإعدادات ============ */
-#view-settings{max-width:880px;margin:0 auto}
+#view-settings{max-width:880px;margin:0 auto;width:100%}
 .set-grid{display:flex;flex-direction:column;gap:14px}
 .set-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .kbd-table{width:100%;border-collapse:collapse;font-size:12.5px}
 .kbd-table td{padding:8px 6px;border-top:1px solid var(--line-soft)}
 .kbd-table tr:first-child td{border-top:none}
-.kbd-table td:first-child{width:130px;color:var(--ink-2);font-weight:600}
+.kbd-table td:first-child{width:150px;color:var(--ink-2);font-weight:600}
 kbd{
   font:600 10.5px var(--mono);background:var(--panel-3);
   border:1px solid var(--line);border-bottom-width:2px;
@@ -596,18 +543,21 @@ kbd{
   border:1px dashed var(--line);border-radius:var(--r-sm);display:block;
 }
 .hint{font-size:11.5px;color:var(--ink-3);line-height:1.6}
-
-/* ============ التنبيهات (Toasts) ============ */
-#toasts{
-  position:fixed;top:16px;inset-inline-start:16px;z-index:200;
-  display:flex;flex-direction:column;gap:10px;max-width:380px;
+.perf-now{
+  font:500 11px var(--mono);direction:ltr;display:inline-block;
+  padding:4px 10px;border-radius:99px;margin-top:4px;
 }
+.perf-now.light{color:var(--amber);border:1px solid rgba(255,178,36,.4)}
+.perf-now.full{color:var(--green);border:1px solid rgba(61,214,140,.35)}
+
+/* ============ التنبيهات ============ */
+#toasts{position:fixed;top:16px;inset-inline-start:16px;z-index:200;display:flex;flex-direction:column;gap:10px;max-width:380px}
 .toast{
   display:flex;gap:12px;align-items:flex-start;
   background:var(--panel-3);border:1px solid var(--line);
   border-inline-start:3px solid var(--blue);
   border-radius:var(--r-md);padding:13px 16px;
-  box-shadow:var(--shadow-pop);animation:toastIn .3s cubic-bezier(.2,1.4,.4,1);
+  box-shadow:var(--shadow-pop);animation:toastIn .2s ease;
 }
 .toast.ok{border-inline-start-color:var(--green)}
 .toast.warn{border-inline-start-color:var(--amber)}
@@ -622,49 +572,38 @@ kbd{
 .toast .t-acts{display:flex;gap:8px;margin-top:9px}
 .toast .t-acts button{
   font:600 11px var(--mono);padding:5px 13px;border-radius:6px;
-  border:1px solid var(--line);color:var(--ink-2);transition:.14s;
+  border:1px solid var(--line);color:var(--ink-2);transition:background .12s;
 }
 .toast .t-acts button:hover{color:var(--ink);border-color:#4a5462}
 .toast .t-acts button.hot{color:var(--red);border-color:rgba(255,75,62,.5)}
 .toast .t-x{flex:none;color:var(--ink-3);padding:2px}
 .toast .t-x:hover{color:var(--ink)}
-@keyframes toastIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
-.toast.out{animation:toastOut .25s ease forwards}
-@keyframes toastOut{to{opacity:0;transform:translateX(-24px)}}
+@keyframes toastIn{from{opacity:0}to{opacity:1}}
+.toast.out{animation:toastOut .2s ease forwards}
+@keyframes toastOut{to{opacity:0}}
 
-/* ============ النوافذ المنبثقة ============ */
+/* ============ النوافذ — بلا backdrop-filter ============ */
 .modal-back{
-  position:fixed;inset:0;z-index:150;background:rgba(6,8,12,.7);
-  backdrop-filter:blur(4px);display:none;place-items:center;padding:20px;
+  position:fixed;inset:0;z-index:150;background:rgba(6,8,12,.8);
+  display:none;place-items:center;padding:20px;
 }
 .modal-back.on{display:grid}
 .modal{
   width:min(440px,100%);background:var(--panel-2);
   border:1px solid var(--line);border-radius:var(--r-lg);
   box-shadow:var(--shadow-pop);overflow:hidden;
-  animation:modalIn .28s cubic-bezier(.2,1.3,.4,1);
+  animation:modalIn .18s ease;
 }
-@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
-.modal-head{
-  display:flex;align-items:center;gap:10px;padding:16px 20px;
-  border-bottom:1px solid var(--line);background:var(--panel);
-}
+@keyframes modalIn{from{opacity:0}to{opacity:1}}
+.modal-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
 .modal-head h3{font-size:15px;font-weight:700;flex:1}
 .modal-body{padding:20px;font-size:13px;color:var(--ink-2)}
 .modal-body p{line-height:1.7}
-.modal-foot{
-  display:flex;justify-content:flex-end;gap:10px;
-  padding:14px 20px;border-top:1px solid var(--line);background:var(--panel);
-}
-/* نافذة التقدم */
-.prog-track{
-  height:8px;border-radius:99px;background:var(--track);
-  overflow:hidden;margin:6px 0 10px;
-}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--line);background:var(--panel)}
+.prog-track{height:8px;border-radius:99px;background:var(--track);overflow:hidden;margin:6px 0 10px}
 .prog-track i{display:block;height:100%;width:0;background:var(--red);border-radius:99px;transition:width .2s}
 .prog-pct{font:600 13px var(--mono);direction:ltr;color:var(--ink)}
 
-/* ============ بانر عدم الدعم ============ */
 #noSupport{
   display:none;margin:0 22px 16px;padding:14px 18px;
   background:rgba(255,75,62,.08);border:1px solid rgba(255,75,62,.4);
@@ -695,18 +634,15 @@ kbd{
 </head>
 <body>
 
-<!-- ============ مكتبة الأيقونات (SVG Sprite) ============ -->
+<!-- ============ مكتبة الأيقونات ============ -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-disc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
-  <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M9 5a3 3 0 0 1 6 0v5M9 10v1a3 3 0 0 0 4.7 2.5M5 11a7 7 0 0 0 11 5.8M12 18v3M3 3l18 18"/></symbol>
   <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
-  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></symbol>
   <symbol id="i-mark" viewBox="0 0 24 24"><path d="M6 3v18M6 4h11l-3 4 3 4H6"/></symbol>
-  <symbol id="i-diamond" viewBox="0 0 24 24"><path d="M12 3l7 9-7 9-7-9z"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-9 0l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
   <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3-11 11-4 1zM14 7l3 3"/></symbol>
@@ -725,34 +661,28 @@ kbd{
   <symbol id="i-skip-fwd" viewBox="0 0 24 24"><path d="M5 5v14l11-7zM19 5v14"/></symbol>
   <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
   <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9l5 6M21 9l-5 6"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
   <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.1M10 10h.1M14 10h.1M18 10h.1M6 14h.1M18 14h.1M9 14h6"/></symbol>
-  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
-  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></symbol>
 </svg>
 
 <!-- ============ هيكل التطبيق ============ -->
 <div id="app">
 
-  <!-- الشريط الجانبي -->
   <aside class="sidebar">
     <div class="brand-mark" id="brandMark" title="استوديو التسجيل"></div>
-
-    <button class="nav-btn on" data-view="studio" id="navStudio">
+    <button class="nav-btn on" data-view="studio">
       <svg class="ic"><use href="#i-disc"/></svg><span>الاستوديو</span>
     </button>
-    <button class="nav-btn" data-view="library" id="navLibrary">
+    <button class="nav-btn" data-view="library">
       <svg class="ic"><use href="#i-archive"/></svg><span>المكتبة</span>
     </button>
-    <button class="nav-btn" data-view="editor" id="navEditor">
+    <button class="nav-btn" data-view="editor">
       <svg class="ic"><use href="#i-scissors"/></svg><span>المحرر</span>
     </button>
-    <button class="nav-btn" data-view="settings" id="navSettings">
+    <button class="nav-btn" data-view="settings">
       <svg class="ic"><use href="#i-gear"/></svg><span>الإعدادات</span>
     </button>
-
     <div class="nav-sep"></div>
-
     <div class="side-status">
       <div class="led" id="ledRec"><i></i>REC</div>
       <div class="led" id="ledSys"><i></i>SYS</div>
@@ -762,7 +692,6 @@ kbd{
   </aside>
 
   <main>
-    <!-- الشريط العلوي -->
     <header class="topbar">
       <div class="tb-title">
         <h1 id="pageTitle">الاستوديو</h1>
@@ -780,540 +709,549 @@ kbd{
       متصفحك لا يدعم التقاط الشاشة (getDisplayMedia). استخدم Chrome أو Edge أو Firefox حديثاً لتفعيل كل الميزات.
     </div>
 
-    <!-- ============ مشهد: الاستوديو ============ -->
+    <!-- الخلفية الصلبة + المشاهد فوقها -->
     <div class="views">
-    <section class="view on" id="view-studio">
+      <div class="bg-dots" aria-hidden="true"></div>
 
-      <div class="studio-main">
+      <!-- ══════ الاستوديو ══════ -->
+      <section class="view on" id="view-studio">
+        <div class="studio-main">
 
-        <!-- المرقب: المعاينة الحية -->
-        <div class="monitor">
-          <div class="mon-top">
-            <div class="rec-lamp"><i></i><span id="recLampTxt">STANDBY</span></div>
-            <span class="chip" id="chipRes">— × —</span>
-            <span class="chip" id="chipFps">— FPS</span>
-            <span class="chip hot" id="chipMarks" hidden>0 MARKS</span>
-            <div class="mon-actions">
-              <button class="icon-btn" id="btnReplaceSrc" title="استبدال مصدر الشاشة" disabled>
-                <svg class="ic"><use href="#i-refresh"/></svg>
+          <div class="monitor">
+            <div class="mon-top">
+              <div class="rec-lamp"><i></i><span id="recLampTxt">STANDBY</span></div>
+              <span class="chip" id="chipRes">— × —</span>
+              <span class="chip" id="chipFps">— FPS</span>
+              <span class="chip hot" id="chipMarks" hidden>0 MARKS</span>
+              <div class="mon-actions">
+                <button class="icon-btn" id="btnReplaceSrc" title="استبدال مصدر الشاشة" disabled>
+                  <svg class="ic"><use href="#i-refresh"/></svg>
+                </button>
+                <button class="icon-btn" id="btnFull" title="ملء الشاشة">
+                  <svg class="ic"><use href="#i-expand"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="stage-wrap" id="stageWrap">
+              <canvas id="stage"></canvas>
+
+              <div class="pip-box" id="pipBox" hidden>
+                <span class="pip-tag">CAM · PIP</span>
+                <div class="pip-resize" id="pipResize"></div>
+              </div>
+
+              <div class="cd-ov" id="cdOv">
+                <div class="cd-num" id="cdNum">3</div>
+                <div class="cd-ring">
+                  <svg width="170" height="170">
+                    <circle class="bgc" cx="85" cy="85" r="75"></circle>
+                    <circle class="fgc" id="cdRing" cx="85" cy="85" r="75"></circle>
+                  </svg>
+                </div>
+                <div class="cd-label">GET READY</div>
+                <button class="cd-cancel" id="cdCancel">إلغاء (Esc)</button>
+              </div>
+            </div>
+
+            <div class="mon-bottom">
+              <input type="text" class="file-name" id="fileNameInput" spellcheck="false" dir="ltr">
+              <span class="chip" id="chipTargetRes">1920×1080</span>
+              <span class="chip" id="chipFmt">WEBM</span>
+            </div>
+          </div>
+
+          <div class="transport">
+            <div class="tp-group">
+              <button class="rec-btn" id="btnRec" title="بدء / إيقاف التسجيل (R)">
+                <span class="rec-core"></span>
               </button>
-              <button class="icon-btn" id="btnFull" title="ملء الشاشة">
-                <svg class="ic"><use href="#i-expand"/></svg>
+              <button class="t-btn" id="btnPause" title="إيقاف مؤقت (مسافة)" disabled>
+                <svg class="ic"><use href="#i-pause"/></svg>
+              </button>
+              <button class="t-btn" id="btnMark" title="وضع علامة زمنية (M)" disabled>
+                <svg class="ic"><use href="#i-mark"/></svg>
+                <span class="badge" id="markBadge" hidden>0</span>
+              </button>
+            </div>
+
+            <div class="tp-sep"></div>
+
+            <div class="tp-timer">
+              <span id="timerVal">00:00:00</span>
+              <span class="dot">:</span>
+            </div>
+
+            <div class="tp-sep"></div>
+
+            <div class="tp-stat"><b id="statSize">0.0 MB</b><span>DATA SIZE</span></div>
+            <div class="tp-stat"><b id="statBitrate">— Mbps</b><span>EST. RATE</span></div>
+
+            <div class="tp-sep"></div>
+
+            <div class="tp-group">
+              <button class="t-btn" id="btnMicQuick" title="تفعيل الميكروفون">
+                <svg class="ic"><use href="#i-mic"/></svg>
+              </button>
+              <button class="t-btn" id="btnCamQuick" title="تفعيل الكاميرا">
+                <svg class="ic"><use href="#i-cam"/></svg>
               </button>
             </div>
           </div>
-
-          <div class="stage-wrap" id="stageWrap">
-            <canvas id="stage"></canvas>
-
-            <!-- صندوق التحكم بكاميرا PiP (لا يظهر داخل التسجيل) -->
-            <div class="pip-box" id="pipBox" hidden>
-              <span class="pip-tag">CAM · PIP</span>
-              <div class="pip-resize" id="pipResize"></div>
-            </div>
-
-            <!-- غطاء العدّ التنازلي -->
-            <div class="cd-ov" id="cdOv">
-              <div class="cd-num" id="cdNum">3</div>
-              <div class="cd-ring">
-                <svg width="170" height="170">
-                  <circle class="bgc" cx="85" cy="85" r="75"></circle>
-                  <circle class="fgc" id="cdRing" cx="85" cy="85" r="75"></circle>
-                </svg>
-              </div>
-              <div class="cd-label">GET READY</div>
-              <button class="cd-cancel" id="cdCancel">إلغاء (Esc)</button>
-            </div>
-          </div>
-
-          <div class="mon-bottom">
-            <input type="text" class="file-name" id="fileNameInput" spellcheck="false" dir="ltr">
-            <span class="chip" id="chipTargetRes">1920×1080</span>
-            <span class="chip" id="chipFmt">WEBM/VP9</span>
-          </div>
         </div>
 
-        <!-- شريط النقل -->
-        <div class="transport">
-          <div class="tp-group">
-            <button class="rec-btn" id="btnRec" title="بدء / إيقاف التسجيل (R)">
-              <span class="rec-core"></span>
-            </button>
-            <button class="t-btn" id="btnPause" title="إيقاف مؤقت (مسافة)" disabled>
-              <svg class="ic"><use href="#i-pause"/></svg>
-            </button>
-            <button class="t-btn" id="btnMark" title="وضع علامة زمنية (M)" disabled>
-              <svg class="ic"><use href="#i-mark"/></svg>
-              <span class="badge" id="markBadge" hidden>0</span>
-            </button>
-          </div>
+        <div class="rack">
 
-          <div class="tp-sep"></div>
-
-          <div class="tp-timer" id="timerBox">
-            <span id="timerVal">00:00:00</span>
-            <span class="dot" id="timerDot">:</span>
-          </div>
-
-          <div class="tp-sep"></div>
-
-          <div class="tp-stat">
-            <b id="statSize">0.0 MB</b>
-            <span>DATA SIZE</span>
-          </div>
-          <div class="tp-stat">
-            <b id="statBitrate">— Mbps</b>
-            <span>EST. RATE</span>
-          </div>
-
-          <div class="tp-sep"></div>
-
-          <div class="tp-group">
-            <button class="t-btn" id="btnMicQuick" title="تفعيل الميكروفون">
-              <svg class="ic"><use href="#i-mic"/></svg>
-            </button>
-            <button class="t-btn" id="btnCamQuick" title="تفعيل الكاميرا">
-              <svg class="ic"><use href="#i-cam"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- الراك: لوحة المزج -->
-      <div class="rack">
-
-        <!-- وحدة الصوت -->
-        <div class="module">
-          <div class="module-head"><b>مزج الصوت</b><code>AUDIO MIX</code></div>
-          <div class="module-body">
-
-            <!-- صوت النظام -->
-            <div class="a-row">
-              <div class="a-main">
-                <div class="a-head">
-                  <span class="a-led" id="ledSysRow"></span>
-                  <b>صوت النظام</b>
-                  <button class="mute-btn" id="btnMuteSys" title="كتم صوت النظام في التسجيل">
-                    <svg class="ic" style="width:15px;height:15px"><use href="#i-speaker"/></svg>
-                  </button>
+          <div class="module">
+            <div class="module-head"><b>مزج الصوت</b><code>AUDIO MIX</code></div>
+            <div class="module-body">
+              <div class="a-row">
+                <div class="a-main">
+                  <div class="a-head">
+                    <span class="a-led" id="ledSysRow"></span>
+                    <b>صوت النظام</b>
+                    <button class="mute-btn" id="btnMuteSys" title="كتم صوت النظام في التسجيل">
+                      <svg class="ic" style="width:15px;height:15px"><use href="#i-speaker"/></svg>
+                    </button>
+                  </div>
+                  <div class="fader">
+                    <input type="range" id="fSys" min="0" max="200" value="100">
+                    <span class="db" id="dbSys">0 dB</span>
+                  </div>
                 </div>
-                <div class="fader">
-                  <input type="range" id="fSys" min="0" max="200" value="100">
-                  <span class="db" id="dbSys">0 dB</span>
+                <div class="vu" id="vuSys"></div>
+              </div>
+
+              <div class="a-row">
+                <div class="a-main">
+                  <div class="a-head">
+                    <span class="a-led" id="ledMicRow"></span>
+                    <b>الميكروفون</b>
+                    <button class="power-btn" id="btnMicPower">ENABLE</button>
+                    <button class="mute-btn" id="btnMuteMic" title="كتم الميكروفون">
+                      <svg class="ic" style="width:15px;height:15px"><use href="#i-speaker"/></svg>
+                    </button>
+                  </div>
+                  <div class="fader">
+                    <input type="range" id="fMic" min="0" max="200" value="100">
+                    <span class="db" id="dbMic">0 dB</span>
+                  </div>
                 </div>
+                <div class="vu" id="vuMic"></div>
               </div>
-              <div class="vu" id="vuSys"></div>
-            </div>
 
-            <!-- الميكروفون -->
-            <div class="a-row">
-              <div class="a-main">
-                <div class="a-head">
-                  <span class="a-led" id="ledMicRow"></span>
-                  <b>الميكروفون</b>
-                  <button class="power-btn" id="btnMicPower">ENABLE</button>
-                  <button class="mute-btn" id="btnMuteMic" title="كتم الميكروفون">
-                    <svg class="ic" style="width:15px;height:15px"><use href="#i-speaker"/></svg>
-                  </button>
-                </div>
-                <div class="fader">
-                  <input type="range" id="fMic" min="0" max="200" value="100">
-                  <span class="db" id="dbMic">0 dB</span>
-                </div>
-              </div>
-              <div class="vu" id="vuMic"></div>
-            </div>
-
-            <p class="hint" style="margin-top:10px">
-              صوت النظام يُلتقط من نافذة اختيار المصدر — فعّل خيار «مشاركة صوت التبويب/الشاشة» فيها.
-            </p>
-          </div>
-        </div>
-
-        <!-- وحدة الفيديو -->
-        <div class="module">
-          <div class="module-head"><b>جودة التسجيل</b><code>VIDEO</code></div>
-          <div class="module-body">
-            <div class="field">
-              <label>الدقة المستهدفة</label>
-              <select id="selRes">
-                <option value="auto" selected>أصلية (من المصدر)</option>
-                <option value="3840x2160">2160p · 4K</option>
-                <option value="2560x1440">1440p · QHD</option>
-                <option value="1920x1080" selected>1080p · FHD</option>
-                <option value="1280x720">720p · HD</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>معدل الإطارات</label>
-              <div class="seg" id="segFps">
-                <button data-fps="24">24</button>
-                <button data-fps="30" class="on">30</button>
-                <button data-fps="60">60</button>
-              </div>
-            </div>
-            <div class="field">
-              <label>معدل البت</label>
-              <div class="fader">
-                <input type="range" id="fBitrate" min="2" max="40" step="1" value="12">
-                <span class="db" id="bitVal">12 Mbps</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- وحدة البدء -->
-        <div class="module">
-          <div class="module-head"><b>قبل البدء</b><code>PRE-ROLL</code></div>
-          <div class="module-body">
-            <div class="field">
-              <label>عدّ تنازلي قبل التسجيل</label>
-              <div class="seg" id="segCd">
-                <button data-cd="0">بدون</button>
-                <button data-cd="3" class="on">3ث</button>
-                <button data-cd="5">5ث</button>
-                <button data-cd="10">10ث</button>
-              </div>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="setBurnQuick">
-              <span class="sw-track"></span>
-              <span class="sw-txt"><b>حرق مؤشر REC داخل الفيديو</b><small>يُرسم وقت التسجيل في زاوية الملف الناتج نفسه</small></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ مشهد: المكتبة ============ -->
-    <section class="view" id="view-library">
-      <div class="lib-head">
-        <div>
-          <h2>مكتبة التسجيلات</h2>
-          <div class="lib-sub">ARCHIVE · INDEXEDDB</div>
-        </div>
-        <div class="search-box">
-          <svg class="ic"><use href="#i-search"/></svg>
-          <input type="text" id="libSearch" placeholder="ابحث بالاسم…">
-        </div>
-        <select class="lib-sort" id="libSort">
-          <option value="new">الأحدث أولاً</option>
-          <option value="old">الأقدم أولاً</option>
-          <option value="long">الأطول مدة</option>
-          <option value="big">الأكبر حجماً</option>
-        </select>
-      </div>
-
-      <div class="lib-list" id="libList"></div>
-
-      <div class="lib-empty" id="libEmpty" hidden>
-        <svg class="ic"><use href="#i-archive"/></svg>
-        <p>لا توجد تسجيلات محفوظة بعد.<br>ابدأ أول تسجيلة لك من الاستوديو وستظهر هنا تلقائياً.</p>
-        <button class="btn primary" id="btnGoStudio">
-          <svg class="ic"><use href="#i-disc"/></svg> ابدأ التسجيل
-        </button>
-      </div>
-
-      <div class="lib-foot" id="libFoot" hidden>
-        <span id="libCountTxt">—</span>
-        <span id="libTotalTxt">—</span>
-      </div>
-    </section>
-
-    <!-- ============ مشهد: المحرر ============ -->
-    <section class="view" id="view-editor">
-
-      <div class="ed-empty" id="edEmpty">
-        <svg class="ic"><use href="#i-scissors"/></svg>
-        <p>لم يتم فتح أي تسجيلة.<br>اختر ملفاً من المكتبة لقصّه ووضع علاماته واستخراج اللقطات.</p>
-        <button class="btn" id="btnGoLibrary">
-          <svg class="ic"><use href="#i-archive"/></svg> فتح المكتبة
-        </button>
-      </div>
-
-      <div id="edWrap" hidden>
-        <div class="ed-grid">
-          <div class="ed-left">
-
-            <!-- مشغل المرقب -->
-            <div class="monitor">
-              <div class="mon-top">
-                <div class="rec-lamp"><i></i><span>PREVIEW</span></div>
-                <span class="chip" id="edChipRes">—</span>
-                <div class="mon-actions">
-                  <button class="icon-btn" id="btnEdFull" title="ملء الشاشة">
-                    <svg class="ic"><use href="#i-expand"/></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="stage-wrap" style="max-height:none;aspect-ratio:auto;min-height:280px">
-                <video id="edVideo" playsinline></video>
-              </div>
-            </div>
-
-            <!-- نقل المحرر -->
-            <div class="ed-transport">
-              <button class="t-btn" id="edBack" title="ترجيع 5 ثوانٍ">
-                <svg class="ic"><use href="#i-skip-back"/></svg>
-              </button>
-              <button class="t-btn" id="edPlay" title="تشغيل / إيقاف (مسافة)">
-                <svg class="ic"><use href="#i-play"/></svg>
-              </button>
-              <button class="t-btn" id="edFwd" title="تقديم 5 ثوانٍ">
-                <svg class="ic"><use href="#i-skip-fwd"/></svg>
-              </button>
-              <div class="seg" style="width:190px" id="edSpeedSeg">
-                <button data-rate="0.5">0.5×</button>
-                <button data-rate="1" class="on">1×</button>
-                <button data-rate="1.5">1.5×</button>
-                <button data-rate="2">2×</button>
-              </div>
-              <button class="t-btn" id="edMute" title="كتم">
-                <svg class="ic"><use href="#i-speaker"/></svg>
-              </button>
-              <div class="fader" style="width:110px">
-                <input type="range" id="edVol" min="0" max="100" value="100">
-              </div>
-              <div class="ed-time"><b id="edCur">00:00:00</b> / <span id="edDur">00:00:00</span></div>
-            </div>
-
-            <!-- الخط الزمني -->
-            <div class="timeline-wrap">
-              <div class="tl-head">
-                <b>الخط الزمني</b><code>TIMELINE</code>
-                <span class="tl-zoom" id="tlZoom">00:00:00.000</span>
-              </div>
-              <div class="tl-body" id="tlBody">
-                <canvas id="tlCanvas"></canvas>
-                <div class="tl-fill" id="tlFill"></div>
-                <div class="tl-mask" id="tlMaskA"></div>
-                <div class="tl-mask" id="tlMaskB"></div>
-                <div class="tl-handle" id="tlHandleA" title="بداية القص"></div>
-                <div class="tl-handle" id="tlHandleB" title="نهاية القص"></div>
-                <div class="tl-hover-tip" id="tlTip"></div>
-              </div>
-              <div class="tl-ruler">
-                <span>00:00</span><span id="tlMid">—</span><span id="tlEnd">—</span>
-              </div>
+              <p class="hint" style="margin-top:10px">
+                صوت النظام يُلتقط من نافذة اختيار المصدر — فعّل خيار «مشاركة صوت التبويب/الشاشة» فيها.
+              </p>
             </div>
           </div>
 
-          <!-- راك المحرر -->
-          <div class="ed-rack">
-            <div class="module">
-              <div class="module-head"><b>الملف</b><code>INFO</code></div>
-              <div class="module-body">
-                <h3 id="edName" style="font-size:14.5px;font-weight:700;direction:ltr;text-align:right;word-break:break-all;margin-bottom:10px"></h3>
-                <div class="ed-meta-list">
-                  <div class="mi"><span>المدة</span><b id="edMetaDur">—</b></div>
-                  <div class="mi"><span>الحجم</span><b id="edMetaSize">—</b></div>
-                  <div class="mi"><span>الدقة</span><b id="edMetaRes">—</b></div>
-                  <div class="mi"><span>الصيغة</span><b id="edMetaFmt">—</b></div>
-                  <div class="mi"><span>تاريخ الحفظ</span><b id="edMetaDate">—</b></div>
-                  <div class="mi"><span>العلامات</span><b id="edMetaMarks">—</b></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="module">
-              <div class="module-head"><b>القص والتصدير</b><code>TRIM</code></div>
-              <div class="module-body">
-                <div class="trim-readout" id="trimReadout">—</div>
-                <div class="ed-tools">
-                  <button class="btn" id="btnSetA">
-                    <svg class="ic"><use href="#i-skip-back"/></svg> تعيين البداية هنا
-                  </button>
-                  <button class="btn" id="btnSetB">
-                    <svg class="ic"><use href="#i-skip-fwd"/></svg> تعيين النهاية هنا
-                  </button>
-                  <button class="btn" id="btnPlaySel">
-                    <svg class="ic"><use href="#i-play"/></svg> تشغيل التحديد فقط
-                  </button>
-                  <button class="btn ghost-amber" id="btnTrimExport">
-                    <svg class="ic"><use href="#i-scissors"/></svg> قص وتصدير المقطع
-                  </button>
-                  <button class="btn" id="btnClearTrim">
-                    <svg class="ic"><use href="#i-x"/></svg> مسح التحديد
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="module">
-              <div class="module-head"><b>أدوات سريعة</b><code>TOOLS</code></div>
-              <div class="module-body">
-                <div class="ed-tools">
-                  <button class="btn" id="btnSnap">
-                    <svg class="ic"><use href="#i-camera"/></svg> استخراج لقطة PNG
-                  </button>
-                  <button class="btn" id="btnEdMark">
-                    <svg class="ic"><use href="#i-mark"/></svg> علامة عند اللحظة الحالية
-                  </button>
-                  <button class="btn" id="btnEdDownload">
-                    <svg class="ic"><use href="#i-download"/></svg> تنزيل الملف الأصلي
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ مشهد: الإعدادات ============ -->
-    <section class="view" id="view-settings">
-      <div class="set-grid">
-
-        <div class="module">
-          <div class="module-head"><b>التسجيل</b><code>RECORD</code></div>
-          <div class="module-body">
-            <div class="set-two">
+          <div class="module">
+            <div class="module-head"><b>جودة التسجيل</b><code>VIDEO</code></div>
+            <div class="module-body">
               <div class="field">
-                <label>العدّ التنازلي الافتراضي</label>
-                <select id="setCount">
-                  <option value="0">بدون عدّ</option>
-                  <option value="3" selected>3 ثوانٍ</option>
-                  <option value="5">5 ثوانٍ</option>
-                  <option value="10">10 ثوانٍ</option>
+                <label>الدقة المستهدفة</label>
+                <select id="selRes">
+                  <option value="auto">أصلية (من المصدر)</option>
+                  <option value="2560x1440">1440p · QHD</option>
+                  <option value="1920x1080">1080p · FHD</option>
+                  <option value="1280x720">720p · HD</option>
                 </select>
               </div>
               <div class="field">
-                <label>إيقاف تلقائي بعد مدة</label>
-                <select id="setMaxDur">
+                <label>معدل الإطارات</label>
+                <div class="seg" id="segFps">
+                  <button data-fps="24">24</button>
+                  <button data-fps="30" class="on">30</button>
+                  <button data-fps="60">60</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>معدل البت</label>
+                <div class="fader">
+                  <input type="range" id="fBitrate" min="2" max="40" step="1" value="12">
+                  <span class="db" id="bitVal">12 Mbps</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head"><b>قبل البدء</b><code>PRE-ROLL</code></div>
+            <div class="module-body">
+              <div class="field">
+                <label>عدّ تنازلي قبل التسجيل</label>
+                <div class="seg" id="segCd">
+                  <button data-cd="0">بدون</button>
+                  <button data-cd="3" class="on">3ث</button>
+                  <button data-cd="5">5ث</button>
+                  <button data-cd="10">10ث</button>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setBurnQuick">
+                <span class="sw-track"></span>
+                <span class="sw-txt"><b>حرق مؤشر REC داخل الفيديو</b><small>يُرسم وقت التسجيل في زاوية الملف الناتج نفسه</small></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ المكتبة ══════ -->
+      <section class="view" id="view-library">
+        <div class="lib-head">
+          <div>
+            <h2>مكتبة التسجيلات</h2>
+            <div class="lib-sub">ARCHIVE · INDEXEDDB</div>
+          </div>
+          <div class="search-box">
+            <svg class="ic"><use href="#i-search"/></svg>
+            <input type="text" id="libSearch" placeholder="ابحث بالاسم…">
+          </div>
+          <select class="lib-sort" id="libSort">
+            <option value="new">الأحدث أولاً</option>
+            <option value="old">الأقدم أولاً</option>
+            <option value="long">الأطول مدة</option>
+            <option value="big">الأكبر حجماً</option>
+          </select>
+        </div>
+
+        <div class="lib-list" id="libList"></div>
+
+        <div class="lib-empty" id="libEmpty" hidden>
+          <svg class="ic"><use href="#i-archive"/></svg>
+          <p>لا توجد تسجيلات محفوظة بعد.<br>ابدأ أول تسجيلة لك من الاستوديو وستظهر هنا تلقائياً.</p>
+          <button class="btn primary" id="btnGoStudio">
+            <svg class="ic"><use href="#i-disc"/></svg> ابدأ التسجيل
+          </button>
+        </div>
+
+        <div class="lib-foot" id="libFoot" hidden>
+          <span id="libCountTxt">—</span>
+          <span id="libTotalTxt">—</span>
+        </div>
+      </section>
+
+      <!-- ══════ المحرر ══════ -->
+      <section class="view" id="view-editor">
+        <div class="ed-empty" id="edEmpty">
+          <svg class="ic"><use href="#i-scissors"/></svg>
+          <p>لم يتم فتح أي تسجيلة.<br>اختر ملفاً من المكتبة لقصّه ووضع علاماته واستخراج اللقطات.</p>
+          <button class="btn" id="btnGoLibrary">
+            <svg class="ic"><use href="#i-archive"/></svg> فتح المكتبة
+          </button>
+        </div>
+
+        <div id="edWrap" hidden>
+          <div class="ed-grid">
+            <div class="ed-left">
+
+              <div class="monitor">
+                <div class="mon-top">
+                  <div class="rec-lamp"><i></i><span>PREVIEW</span></div>
+                  <span class="chip" id="edChipRes">—</span>
+                  <div class="mon-actions">
+                    <button class="icon-btn" id="btnEdFull" title="ملء الشاشة">
+                      <svg class="ic"><use href="#i-expand"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="stage-wrap" style="max-height:none;aspect-ratio:auto;min-height:280px">
+                  <video id="edVideo" playsinline></video>
+                </div>
+              </div>
+
+              <div class="ed-transport">
+                <button class="t-btn" id="edBack" title="ترجيع 5 ثوانٍ">
+                  <svg class="ic"><use href="#i-skip-back"/></svg>
+                </button>
+                <button class="t-btn" id="edPlay" title="تشغيل / إيقاف (مسافة)">
+                  <svg class="ic"><use href="#i-play"/></svg>
+                </button>
+                <button class="t-btn" id="edFwd" title="تقديم 5 ثوانٍ">
+                  <svg class="ic"><use href="#i-skip-fwd"/></svg>
+                </button>
+                <div class="seg" style="width:190px" id="edSpeedSeg">
+                  <button data-rate="0.5">0.5×</button>
+                  <button data-rate="1" class="on">1×</button>
+                  <button data-rate="1.5">1.5×</button>
+                  <button data-rate="2">2×</button>
+                </div>
+                <button class="t-btn" id="edMute" title="كتم">
+                  <svg class="ic"><use href="#i-speaker"/></svg>
+                </button>
+                <div class="fader" style="width:110px">
+                  <input type="range" id="edVol" min="0" max="100" value="100">
+                </div>
+                <div class="ed-time"><b id="edCur">00:00:00</b> / <span id="edDur">00:00:00</span></div>
+              </div>
+
+              <div class="timeline-wrap">
+                <div class="tl-head">
+                  <b>الخط الزمني</b><code>TIMELINE</code>
+                  <span class="tl-zoom" id="tlZoom">00:00:00.00</span>
+                </div>
+                <div class="tl-body" id="tlBody">
+                  <canvas id="tlCanvas"></canvas>
+                  <div class="tl-fill" id="tlFill"></div>
+                  <div class="tl-mask" id="tlMaskA"></div>
+                  <div class="tl-mask" id="tlMaskB"></div>
+                  <div class="tl-handle" id="tlHandleA" title="بداية القص"></div>
+                  <div class="tl-handle" id="tlHandleB" title="نهاية القص"></div>
+                  <div class="tl-hover-tip" id="tlTip"></div>
+                </div>
+                <div class="tl-ruler">
+                  <span>00:00</span><span id="tlMid">—</span><span id="tlEnd">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ed-rack">
+              <div class="module">
+                <div class="module-head"><b>الملف</b><code>INFO</code></div>
+                <div class="module-body">
+                  <h3 id="edName" style="font-size:14.5px;font-weight:700;direction:ltr;text-align:right;word-break:break-all;margin-bottom:10px"></h3>
+                  <div class="ed-meta-list">
+                    <div class="mi"><span>المدة</span><b id="edMetaDur">—</b></div>
+                    <div class="mi"><span>الحجم</span><b id="edMetaSize">—</b></div>
+                    <div class="mi"><span>الدقة</span><b id="edMetaRes">—</b></div>
+                    <div class="mi"><span>الصيغة</span><b id="edMetaFmt">—</b></div>
+                    <div class="mi"><span>تاريخ الحفظ</span><b id="edMetaDate">—</b></div>
+                    <div class="mi"><span>العلامات</span><b id="edMetaMarks">—</b></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="module">
+                <div class="module-head"><b>القص والتصدير</b><code>TRIM</code></div>
+                <div class="module-body">
+                  <div class="trim-readout" id="trimReadout">—</div>
+                  <div class="ed-tools">
+                    <button class="btn" id="btnSetA">
+                      <svg class="ic"><use href="#i-skip-back"/></svg> تعيين البداية هنا
+                    </button>
+                    <button class="btn" id="btnSetB">
+                      <svg class="ic"><use href="#i-skip-fwd"/></svg> تعيين النهاية هنا
+                    </button>
+                    <button class="btn" id="btnPlaySel">
+                      <svg class="ic"><use href="#i-play"/></svg> تشغيل التحديد فقط
+                    </button>
+                    <button class="btn ghost-amber" id="btnTrimExport">
+                      <svg class="ic"><use href="#i-scissors"/></svg> قص وتصدير المقطع
+                    </button>
+                    <button class="btn" id="btnClearTrim">
+                      <svg class="ic"><use href="#i-x"/></svg> مسح التحديد
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="module">
+                <div class="module-head"><b>أدوات سريعة</b><code>TOOLS</code></div>
+                <div class="module-body">
+                  <div class="ed-tools">
+                    <button class="btn" id="btnSnap">
+                      <svg class="ic"><use href="#i-camera"/></svg> استخراج لقطة PNG
+                    </button>
+                    <button class="btn" id="btnEdMark">
+                      <svg class="ic"><use href="#i-mark"/></svg> علامة عند اللحظة الحالية
+                    </button>
+                    <button class="btn" id="btnEdDownload">
+                      <svg class="ic"><use href="#i-download"/></svg> تنزيل الملف الأصلي
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════ الإعدادات ══════ -->
+      <section class="view" id="view-settings">
+        <div class="set-grid">
+
+          <!-- الأداء أولاً -->
+          <div class="module">
+            <div class="module-head"><b>الأداء</b><code>PERFORMANCE</code></div>
+            <div class="module-body">
+              <div class="set-two">
+                <div class="field">
+                  <label>وضع الجهاز</label>
+                  <select id="setPerf">
+                    <option value="auto" selected>تلقائي (يكتشف قوة الجهاز)</option>
+                    <option value="light">خفيف — للأجهزة الضعيفة</option>
+                    <option value="full">كامل — للقوية</option>
+                  </select>
+                  <span class="perf-now" id="perfNow">—</span>
+                </div>
+                <div class="field">
+                  <label>معدل تحديث المعاينة (بدون تسجيل)</label>
+                  <select id="setPreviewFps">
+                    <option value="auto" selected>تلقائي</option>
+                    <option value="10">10 إطار/ث</option>
+                    <option value="15">15 إطار/ث</option>
+                    <option value="30">30 إطار/ث</option>
+                  </select>
+                </div>
+              </div>
+              <p class="hint">
+                الوضع الخفيف: يعطّل نقاط الخلفية والظلال والهالات، يحدّ الدقة بـ 1080p،
+                ويخفض تحديث المعاينة — مصمم خصيصاً لمعالجات مثل Core i3 واللابتوبات الضعيفة.
+                أثناء التسجيل يرسم المحرك بمعدل الإطارات المختار نفسه (وليس 60 دائماً) لتوفير المعالج.
+              </p>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head"><b>التسجيل</b><code>RECORD</code></div>
+            <div class="module-body">
+              <div class="set-two">
+                <div class="field">
+                  <label>العدّ التنازلي الافتراضي</label>
+                  <select id="setCount">
+                    <option value="0">بدون عدّ</option>
+                    <option value="3" selected>3 ثوانٍ</option>
+                    <option value="5">5 ثوانٍ</option>
+                    <option value="10">10 ثوانٍ</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>إيقاف تلقائي بعد مدة</label>
+                  <select id="setMaxDur">
+                    <option value="0" selected>معطّل</option>
+                    <option value="5">5 دقائق</option>
+                    <option value="10">10 دقائق</option>
+                    <option value="30">30 دقيقة</option>
+                    <option value="60">ساعة</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>إيقاف تلقائي عند حجم البيانات</label>
+                <select id="setMaxSize">
                   <option value="0" selected>معطّل</option>
-                  <option value="5">5 دقائق</option>
-                  <option value="10">10 دقائق</option>
-                  <option value="30">30 دقيقة</option>
-                  <option value="60">ساعة</option>
+                  <option value="500">500 MB</option>
+                  <option value="1024">1 GB</option>
+                  <option value="2048">2 GB</option>
                 </select>
               </div>
-            </div>
-            <div class="field">
-              <label>إيقاف تلقائي عند حجم البيانات</label>
-              <select id="setMaxSize">
-                <option value="0" selected>معطّل</option>
-                <option value="500">500 MB</option>
-                <option value="1024">1 GB</option>
-                <option value="2048">2 GB</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>صيغة الترميز (حسب دعم المتصفح)</label>
-              <div id="setMime" style="display:flex;flex-direction:column;gap:8px"></div>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="setBurn">
-              <span class="sw-track"></span>
-              <span class="sw-txt"><b>حرق مؤشر REC والوقت داخل الفيديو</b><small>يُطبع عدّاد أحمر صغير في زاوية الملف الناتج</small></span>
-            </label>
-            <label class="switch">
-              <input type="checkbox" id="setUiSounds">
-              <span class="sw-track"></span>
-              <span class="sw-txt"><b>أصوات الواجهة</b><small>نقرات العدّ التنازلي ونغمات البدء والإيقاف</small></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="set-two">
-          <div class="module">
-            <div class="module-head"><b>الصوت</b><code>AUDIO</code></div>
-            <div class="module-body">
               <div class="field">
-                <label>جهاز الميكروفون</label>
-                <select id="setMicDev"><option value="">الافتراضي</option></select>
+                <label>صيغة الترميز</label>
+                <div id="setMime" style="display:flex;flex-direction:column;gap:6px"></div>
               </div>
               <label class="switch">
-                <input type="checkbox" id="setEcho" checked>
+                <input type="checkbox" id="setBurn">
                 <span class="sw-track"></span>
-                <span class="sw-txt"><b>إلغاء الصدى</b><small>مفيد عند تشغيل صوت النظام مكبراً</small></span>
+                <span class="sw-txt"><b>حرق مؤشر REC والوقت داخل الفيديو</b><small>يُطبع عدّاد أحمر صغير في زاوية الملف الناتج</small></span>
               </label>
               <label class="switch">
-                <input type="checkbox" id="setNoise" checked>
+                <input type="checkbox" id="setUiSounds" checked>
                 <span class="sw-track"></span>
-                <span class="sw-txt"><b>خفض الضجيج</b><small>تنظيف صوت الميكروفون قبل التسجيل</small></span>
+                <span class="sw-txt"><b>أصوات الواجهة</b><small>نقرات العدّ التنازلي ونغمات البدء والإيقاف</small></span>
               </label>
             </div>
           </div>
 
+          <div class="set-two">
+            <div class="module">
+              <div class="module-head"><b>الصوت</b><code>AUDIO</code></div>
+              <div class="module-body">
+                <div class="field">
+                  <label>جهاز الميكروفون</label>
+                  <select id="setMicDev"><option value="">الافتراضي</option></select>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setEcho" checked>
+                  <span class="sw-track"></span>
+                  <span class="sw-txt"><b>إلغاء الصدى</b><small>مفيد عند تشغيل صوت النظام مكبراً</small></span>
+                </label>
+                <label class="switch">
+                  <input type="checkbox" id="setNoise" checked>
+                  <span class="sw-track"></span>
+                  <span class="sw-txt"><b>خفض الضجيج</b><small>تنظيف صوت الميكروفون قبل التسجيل</small></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="module">
+              <div class="module-head"><b>الكاميرا</b><code>CAMERA</code></div>
+              <div class="module-body">
+                <div class="field">
+                  <label>جهاز الكاميرا</label>
+                  <select id="setCamDev"><option value="">الافتراضي</option></select>
+                </div>
+                <p class="hint">تظهر الكاميرا كإطار PiP داخل التسجيل، ويمكن سحبه وتغيير حجمه من المعاينة — حتى منتصف التسجيل.</p>
+              </div>
+            </div>
+          </div>
+
           <div class="module">
-            <div class="module-head"><b>الكاميرا</b><code>CAMERA</code></div>
+            <div class="module-head"><b>العلامة المائية</b><code>WATERMARK</code></div>
+            <div class="module-body">
+              <label class="switch">
+                <input type="checkbox" id="setWmOn">
+                <span class="sw-track"></span>
+                <span class="sw-txt"><b>تفعيل العلامة المائية النصية</b><small>تُرسم مباشرة في ملف الفيديو الناتج</small></span>
+              </label>
+              <div class="set-two">
+                <div class="field">
+                  <label>النص</label>
+                  <input type="text" id="setWmText" placeholder="اسمك أو علامتك التجارية" maxlength="60">
+                </div>
+                <div class="field">
+                  <label>الموضع</label>
+                  <select id="setWmPos">
+                    <option value="br">أسفل اليمين</option>
+                    <option value="bl">أسفل اليسار</option>
+                    <option value="tr">أعلى اليمين</option>
+                    <option value="tl">أعلى اليسار</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>الشفافية</label>
+                <div class="fader">
+                  <input type="range" id="setWmOp" min="15" max="100" value="60">
+                  <span class="db" id="wmOpVal">60%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head"><b>الملفات</b><code>FILE NAME</code></div>
             <div class="module-body">
               <div class="field">
-                <label>جهاز الكاميرا</label>
-                <select id="setCamDev"><option value="">الافتراضي</option></select>
+                <label>قالب اسم التسجيلة</label>
+                <input type="text" id="setNameTpl" dir="ltr" value="REC-{date}-{time}" spellcheck="false">
+                <span class="tpl-prev" id="tplPrev"></span>
+                <p class="hint">المتغيرات المتاحة: <span style="font-family:var(--mono);direction:ltr;display:inline-block">{date}</span> التاريخ، <span style="font-family:var(--mono);direction:ltr;display:inline-block">{time}</span> الوقت.</p>
               </div>
-              <p class="hint">تظهر الكاميرا كإطار PiP داخل التسجيل، ويمكن سحبه وتغيير حجمه من المعاينة — حتى منتصف التسجيل.</p>
             </div>
           </div>
-        </div>
 
-        <div class="module">
-          <div class="module-head"><b>العلامة المائية</b><code>WATERMARK</code></div>
-          <div class="module-body">
-            <label class="switch">
-              <input type="checkbox" id="setWmOn">
-              <span class="sw-track"></span>
-              <span class="sw-txt"><b>تفعيل العلامة المائية النصية</b><small>تُرسم مباشرة في ملف الفيديو الناتج</small></span>
-            </label>
-            <div class="set-two">
-              <div class="field">
-                <label>النص</label>
-                <input type="text" id="setWmText" placeholder="اسمك أو علامتك التجارية" maxlength="60">
-              </div>
-              <div class="field">
-                <label>الموضع</label>
-                <select id="setWmPos">
-                  <option value="br">أسفل اليمين</option>
-                  <option value="bl">أسفل اليسار</option>
-                  <option value="tr">أعلى اليمين</option>
-                  <option value="tl">أعلى اليسار</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label>الشفافية</label>
-              <div class="fader">
-                <input type="range" id="setWmOp" min="15" max="100" value="60">
-                <span class="db" id="wmOpVal">60%</span>
-              </div>
+          <div class="module">
+            <div class="module-head"><b>اختصارات لوحة المفاتيح</b><code>SHORTCUTS</code></div>
+            <div class="module-body">
+              <table class="kbd-table">
+                <tr><td>بدء / إيقاف</td><td><kbd>R</kbd></td></tr>
+                <tr><td>إيقاف مؤقت / استئناف</td><td><kbd>Space</kbd></td></tr>
+                <tr><td>وضع علامة</td><td><kbd>M</kbd></td></tr>
+                <tr><td>إلغاء العدّ التنازلي</td><td><kbd>Esc</kbd></td></tr>
+                <tr><td>التنقل بين المشاهد</td><td><kbd>1</kbd> … <kbd>4</kbd></td></tr>
+              </table>
             </div>
           </div>
         </div>
-
-        <div class="module">
-          <div class="module-head"><b>الملفات</b><code>FILE NAME</code></div>
-          <div class="module-body">
-            <div class="field">
-              <label>قالب اسم التسجيلة</label>
-              <input type="text" id="setNameTpl" dir="ltr" value="REC-{date}-{time}" spellcheck="false">
-              <span class="tpl-prev" id="tplPrev"></span>
-              <p class="hint">المتغيرات المتاحة: <span style="font-family:var(--mono);direction:ltr;display:inline-block">{date}</span> التاريخ، <span style="font-family:var(--mono);direction:ltr;display:inline-block">{time}</span> الوقت.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="module">
-          <div class="module-head"><b>اختصارات لوحة المفاتيح</b><code>SHORTCUTS</code></div>
-          <div class="module-body">
-            <table class="kbd-table">
-              <tr><td>بدء / إيقاف</td><td><kbd>R</kbd></td></tr>
-              <tr><td>إيقاف مؤقت / استئناف</td><td><kbd>Space</kbd></td></tr>
-              <tr><td>وضع علامة</td><td><kbd>M</kbd></td></tr>
-              <tr><td>إلغاء العدّ التنازلي</td><td><kbd>Esc</kbd></td></tr>
-              <tr><td>التنقل بين المشاهد</td><td><kbd>1</kbd> … <kbd>4</kbd></td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
     </div>
   </main>
 </div>
 
-<!-- حاوية التنبيهات -->
 <div id="toasts"></div>
 
-<!-- نافذة عامة -->
 <div class="modal-back" id="modalBack">
   <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-head">
@@ -1328,12 +1266,11 @@ kbd{
   </div>
 </div>
 
-<!-- نافذة التقدم -->
 <div class="modal-back" id="progBack">
   <div class="modal" style="width:min(400px,100%)">
     <div class="modal-head"><h3 id="progTitle">جارٍ التصدير…</h3></div>
     <div class="modal-body">
-      <p id="progMsg">يتم الآن إعادة ترميز المقطع المحدد. أغلق النافذة قيد التشغيل لضمان خروج كل الإطارات.</p>
+      <p id="progMsg">يتم الآن إعادة ترميز المقطع المحدد.</p>
       <div class="prog-track"><i id="progBar"></i></div>
       <div class="prog-pct" id="progPct">0%</div>
     </div>
@@ -1346,9 +1283,13 @@ kbd{
 <script>
 'use strict';
 /* ════════════════════════════════════════════════════════════════
-   REC·STUDIO — محرك التسجيل
-   الأقسام: أدوات · حالة · IndexedDB · مشاهد · أجهزة · صوت ·
-   تركيب Canvas · تدفق REC · مكتبة · محرر · إعدادات · اختصارات
+   REC·STUDIO — نسخة محسَّنة للأجهزة الضعيفة
+   أهم مبدأ أدائي هنا:
+   · حلقة رسم واحدة ذكية: خمول=رسم مرة، معاينة=معدل منخفض،
+     تسجيل=معدل الإطارات المختار (ليس 60 دائماً)
+   · VU بمؤقّت 90ms (وليس rAF) و12 قطعة فقط
+   · المحرر يعمل بأحداث timeupdate (وليس حلقة rAF دائمة)
+   · لا backdrop-filter، ظلال شبه معدومة، DOM writes مؤقتة
    ════════════════════════════════════════════════════════════════ */
 
 /* ─────────── 1) أدوات عامة ─────────── */
@@ -1362,10 +1303,11 @@ function fmtTime(sec, ms=false){
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=Math.floor(sec%60);
   const p=n=>String(n).padStart(2,'0');
   let out=`${p(h)}:${p(m)}:${p(s)}`;
-  if(ms) out+=`.${String(Math.floor((sec%1)*100)).padStart(2,'0')}`;
+  if(ms) out+=`.`+String(Math.floor((sec%1)*100)).padStart(2,'0');
   return out;
 }
 function fmtBytes(b){
+  if(!b) return '0 B';
   if(b<1024) return b+' B';
   if(b<1048576) return (b/1024).toFixed(1)+' KB';
   if(b<1073741824) return (b/1048576).toFixed(1)+' MB';
@@ -1374,7 +1316,6 @@ function fmtBytes(b){
 function fmtDate(ts){
   return new Intl.DateTimeFormat('ar',{dateStyle:'medium',timeStyle:'short'}).format(new Date(ts));
 }
-/* مولّد عشوائي مبذور — لرسم موجة الخط الزمني بشكل ثابت لكل ملف */
 function seededRand(seed){
   let t=seed>>>0;
   return ()=>{ t+=0x6D2B79F5; let r=Math.imul(t^t>>>15,1|t);
@@ -1387,8 +1328,15 @@ function downloadBlob(blob, name){
   a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
 }
+/* كتابة نص مؤقتة — لا نلمس DOM إن لم تتغير القيمة */
+const txtCache=new Map();
+function setTxt(sel, val){
+  if(txtCache.get(sel)===val) return;
+  txtCache.set(sel,val);
+  $(sel).textContent=val;
+}
 
-/* ─────────── 2) التنبيهات ─────────── */
+/* ─────────── 2) التنبيهات والنوافذ ─────────── */
 const T_ICONS={info:'#i-info',ok:'#i-check',warn:'#i-alert',err:'#i-alert'};
 function toast(msg, type='info', actions=null, ttl=4200){
   const box=document.createElement('div');
@@ -1396,10 +1344,10 @@ function toast(msg, type='info', actions=null, ttl=4200){
   box.innerHTML=`
     <svg class="ic"><use href="${T_ICONS[type]}"/></svg>
     <div class="t-body"><p></p></div>
-    <button class="t-x"><svg class="ic" style="width:14px;height:14px"><use href="#i-x"/></svg></button>`;
+    <button class="t-x" title="إغلاق"><svg class="ic" style="width:14px;height:14px"><use href="#i-x"/></svg></button>`;
   box.querySelector('p').textContent=msg;
   if(actions){
-    const acts=document.createElement('div');acts.className='t-acts';
+    const acts=document.createElement('div'); acts.className='t-acts';
     actions.forEach(a=>{
       const b=document.createElement('button');
       b.textContent=a.label; if(a.hot)b.classList.add('hot');
@@ -1408,101 +1356,117 @@ function toast(msg, type='info', actions=null, ttl=4200){
     });
     box.querySelector('.t-body').appendChild(acts);
   }
-  const dismiss=()=>{ box.classList.add('out'); setTimeout(()=>box.remove(),260); };
+  const dismiss=()=>{ box.classList.add('out'); setTimeout(()=>box.remove(),220); };
   box.querySelector('.t-x').onclick=dismiss;
   $('#toasts').appendChild(box);
   if(ttl) setTimeout(dismiss, ttl);
   return dismiss;
 }
 
-/* نافذة تأكيد / إدخال عامة تعيد Promise */
-function dialog({title, body, ok='تأكيد', cancel='إلغاء', danger=false, input=null, inputVal=''}){
+function dialog({title, body, ok='تأكيد', danger=false, input=null, inputVal=''}){
   return new Promise(res=>{
     const back=$('#modalBack');
     $('#mTitle').textContent=title;
     $('#mBody').innerHTML = input
-      ? `<label class="field" style="margin:0"><label style="font-size:11.5px;color:var(--ink-3)">${input}</label>
-         <input type="text" id="mInput" dir="auto"></label>`
-      : `<p>${body}</p>`;
+      ? `<div class="field" style="margin:0">
+           <label class="flabel">${input}</label>
+           <input type="text" id="mInput" dir="auto">
+         </div>`
+      : `<p></p>`;
+    if(!input) $('#mBody p').textContent=body;
     const okB=$('#mOk');
-    okB.textContent=ok; okB.className='btn '+(danger?'primary':'primary');
-    if(input){ const i=$('#mInput'); i.value=inputVal; setTimeout(()=>i.focus(),50); }
+    okB.textContent=ok;
+    if(input){ const i=$('#mInput'); i.value=inputVal; setTimeout(()=>i.focus(),60); }
     back.classList.add('on');
-    const done=v=>{ back.classList.remove('on'); okB.onclick=null; $('#mCancel').onclick=null; res(v); };
+    const done=v=>{ back.classList.remove('on'); okB.onclick=null; $('#mCancel').onclick=null; $('#mClose').onclick=null; res(v); };
     okB.onclick=()=>done(input?($('#mInput').value.trim()||null):true);
     $('#mCancel').onclick=()=>done(null);
-    back.onclick=e=>{ if(e.target===back) done(null); };
+    $('#mClose').onclick=()=>done(null);
     if(input) $('#mInput').onkeydown=e=>{ if(e.key==='Enter') okB.click(); };
   });
 }
-/* نافذة تقدم قابلة للإلغاء */
+
 const prog = {
   show(title){ $('#progTitle').textContent=title; $('#progBar').style.width='0%';
-    $('#progPct').textContent='0%'; $('#progBack').classList.add('on'); this.cancelled=false; },
+    setTxt('#progPct','0%'); $('#progBack').classList.add('on'); this.cancelled=false; },
   set(p){ p=clamp(p,0,1); $('#progBar').style.width=(p*100).toFixed(1)+'%';
-    $('#progPct').textContent=Math.round(p*100)+'%'; },
+    setTxt('#progPct', Math.round(p*100)+'%'); },
   hide(){ $('#progBack').classList.remove('on'); },
   cancelled:false
 };
  $('#btnProgCancel').onclick=()=>{ prog.cancelled=true; };
 
-/* نغمات الواجهة */
-let uiCtx=null;
-function beep(freq=880, dur=0.07, type='sine', gain=0.14){
-  if(!SET.uiSounds) return;
-  try{
-    uiCtx = uiCtx || new (window.AudioContext||window.webkitAudioContext)();
-    if(uiCtx.state==='suspended') uiCtx.resume();
-    const o=uiCtx.createOscillator(), g=uiCtx.createGain();
-    o.type=type; o.frequency.value=freq;
-    g.gain.setValueAtTime(gain, uiCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, uiCtx.currentTime+dur);
-    o.connect(g).connect(uiCtx.destination);
-    o.start(); o.stop(uiCtx.currentTime+dur+0.02);
-  }catch(e){}
-}
-
-/* ─────────── 3) الإعدادات المحفوظة ─────────── */
+/* ─────────── 3) الإعدادات + كشف الأداء ─────────── */
 const MIMES=[
-  {label:'WebM · VP9 + Opus',  mime:'video/webm;codecs=vp9,opus'},
-  {label:'WebM · VP8 + Opus',  mime:'video/webm;codecs=vp8,opus'},
-  {label:'WebM · H.264 + Opus',mime:'video/webm;codecs=h264,opus'},
-  {label:'WebM (افتراضي)',     mime:'video/webm'},
-  {label:'MP4 · H.264 + AAC',  mime:'video/mp4;codecs=h264,aac'},
+  {label:'WebM · VP9 + Opus',   mime:'video/webm;codecs=vp9,opus'},
+  {label:'WebM · VP8 + Opus',   mime:'video/webm;codecs=vp8,opus'},
+  {label:'WebM · H.264 + Opus', mime:'video/webm;codecs=h264,opus'},
+  {label:'WebM (افتراضي)',      mime:'video/webm'},
+  {label:'MP4 · H.264 + AAC',   mime:'video/mp4;codecs=h264,aac'},
 ];
-const supportedMimes = MIMES.filter(m=>window.MediaRecorder && MediaRecorder.isTypeSupported(m.mime));
+const supportedMimes = window.MediaRecorder ? MIMES.filter(m=>MediaRecorder.isTypeSupported(m.mime)) : [];
+
 const DEF_SET={
+  perf:'auto', previewFps:'auto',
   countdown:3, fps:30, res:'1920x1080', bitrate:12,
-  mime: (supportedMimes[0]||{}).mime || 'video/webm',
+  mime:(supportedMimes[0]||{}).mime||'video/webm',
   maxDur:0, maxSize:0, burn:false, uiSounds:true,
   micDev:'', camDev:'', echo:true, noise:true,
   wmOn:false, wmText:'', wmPos:'br', wmOp:60,
   nameTpl:'REC-{date}-{time}',
   sysGain:100, micGain:100,
 };
-let SET = {...DEF_SET};
+let SET={...DEF_SET};
 try{
   const saved=JSON.parse(localStorage.getItem('recstudio-set')||'{}');
   SET={...SET, ...saved};
-  if(!supportedMimes.some(m=>m.mime===SET.mime)) SET.mime=(supportedMimes[0]||{}).mime||'video/webm';
+  if(!supportedMimes.some(m=>m.mime===SET.mime))
+    SET.mime=(supportedMimes[0]||{}).mime||'video/webm';
 }catch(e){}
-function saveSet(){ localStorage.setItem('recstudio-set', JSON.stringify(SET)); }
+function saveSet(){ try{localStorage.setItem('recstudio-set', JSON.stringify(SET));}catch(e){} }
+
+/* كشف قوة الجهاز: i3 (≤4 أنوية منطقية) أو رامات ≤4GB → خفيف */
+function detectWeakDevice(){
+  const cores = navigator.hardwareConcurrency || 4;
+  const mem   = navigator.deviceMemory || 4;   // جيجابايت (كروم)
+  return cores<=4 || mem<=4;
+}
+const PERF={
+  light:false,
+  previewFps:30,     // معدل رسم المعاينة
+  resCap:3840*2160,  // سقف دقة الكانفس
+};
+function applyPerf(){
+  const want = SET.perf==='auto' ? detectWeakDevice() : (SET.perf==='light');
+  PERF.light = want;
+  document.body.classList.toggle('perf-light', want);
+  let pf = SET.previewFps==='auto' ? (want?15:30) : +SET.previewFps;
+  PERF.previewFps = clamp(pf, 5, 30);
+  PERF.resCap = want ? 1920*1080 : 3840*2160;
+  const tag=$('#perfNow');
+  tag.className='perf-now '+(want?'light':'full');
+  tag.textContent = want
+    ? `LIGHT MODE · ${navigator.hardwareConcurrency||'?'} CORES · ${navigator.deviceMemory||'?'}GB`
+    : `FULL MODE · ${navigator.hardwareConcurrency||'?'} CORES`;
+  applyTargetRes();
+  markDirty();
+}
 
 /* ─────────── 4) الحالة العامة ─────────── */
 const S={
   view:'studio',
   screenStream:null, sysTrack:null,
   micStream:null, camStream:null,
-  audio:null,                 // {ctx, dest, sys:{…}, mic:{…}}
+  audio:null,
   recorder:null, chunks:[], bytes:0,
   active:false, paused:false,
   t0:0, pausedAt:0, pausedTotal:0,
   markers:[],
   mimeUsed:null, pendingName:'',
-  frames:0, lastFpsStamp:0,
+  frames:0, lastFpsStamp:performance.now(),
   lib:[], libSearch:'', libSort:'new',
-  editor:null,               // {id, url, rec, tA, tB, stopAt, markers}
-  cdToken:0,                 // لإلغاء العد التنازلي
+  editor:null,
+  cdToken:0,
   pip:{x:0.72, y:0.69, w:0.22},
 };
 function elapsed(){
@@ -1525,7 +1489,7 @@ const dbAdd = rec=>new Promise((res,rej)=>{const t=db.transaction('recordings','
 const dbDel = id =>new Promise((res,rej)=>{const t=db.transaction('recordings','readwrite');t.objectStore('recordings').delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error);});
 const dbAll = ()=>new Promise((res,rej)=>{const t=db.transaction('recordings','readonly');const r=t.objectStore('recordings').getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});
 
-/* ─────────── 6) التنقل بين المشاهد ─────────── */
+/* ─────────── 6) التنقل ─────────── */
 const VIEWS={
   studio:{title:'الاستوديو', code:'STUDIO'},
   library:{title:'مكتبة التسجيلات', code:'ARCHIVE'},
@@ -1537,35 +1501,32 @@ function setView(v){
   $$('.view').forEach(x=>x.classList.remove('on'));
   $('#view-'+v).classList.add('on');
   $$('.nav-btn').forEach(b=>b.classList.toggle('on', b.dataset.view===v));
-  $('#pageTitle').textContent=VIEWS[v].title;
-  $('#pageCode').textContent=VIEWS[v].code;
+  setTxt('#pageTitle', VIEWS[v].title);
+  setTxt('#pageCode', VIEWS[v].code);
   if(v==='library') renderLibrary();
 }
- $$('.nav-btn').forEach(b=>b.onclick=()=>{ beep(1200,0.03,'square',0.05); setView(b.dataset.view); });
+ $$('.nav-btn').forEach(b=>b.onclick=()=>{ beep(1200,0.03,'square',0.04); setView(b.dataset.view); });
  $('#btnGoStudio').onclick=()=>setView('studio');
  $('#btnGoLibrary').onclick=()=>setView('library');
 
-/* ─────────── 7) الساعة وحالة الواجهة ─────────── */
+/* ─────────── 7) الساعة والحالة ─────────── */
 setInterval(()=>{
   const d=new Date();
-  $('#clock').textContent=d.toLocaleTimeString('en-GB');
-  $('#clockDate').textContent=new Intl.DateTimeFormat('ar',{dateStyle:'full'}).format(d);
+  setTxt('#clock', d.toLocaleTimeString('en-GB'));
+  setTxt('#clockDate', new Intl.DateTimeFormat('ar',{dateStyle:'full'}).format(d));
 },1000);
 function setStateBadge(mode){
   const b=$('#stateBadge');
   b.className='state-badge'+(mode==='rec'?' rec':mode==='paused'?' paused':'');
   b.querySelector('span').textContent = mode==='rec'?'REC':mode==='paused'?'PAUSED':mode==='idle'?'STANDBY':'READY';
-  $('#recLampTxt').textContent = mode==='rec'?'● REC':mode==='paused'?'PAUSE':'STANDBY';
+  setTxt('#recLampTxt', mode==='rec'?'● REC':mode==='paused'?'PAUSE':'STANDBY');
   document.body.classList.toggle('is-recording', mode==='rec');
   document.body.classList.toggle('is-paused', mode==='paused');
   $('#brandMark').classList.toggle('pulse', mode==='rec');
   $('#ledRec').className='led'+(mode==='rec'?' on rec':'');
 }
-function setLed(id,on,cls){
-  const el=$('#'+id);
-  el.className='led'+(on?' on '+(cls||''):'');
-}
-/* دعم المتصفح */
+function setLed(id,on,cls){ $('#'+id).className='led'+(on?' on '+(cls||''):''); }
+
 const displayOK = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
 if(!displayOK){
   $('#noSupport').classList.add('on');
@@ -1573,16 +1534,18 @@ if(!displayOK){
   $('#supportBadge').classList.add('bad');
 }
 
-/* ─────────── 8) عناصر الوسائط الخفية ─────────── */
+/* ─────────── 8) عناصر وسائط خفية ─────────── */
 const screenVideo=document.createElement('video');
 screenVideo.muted=true; screenVideo.playsInline=true;
 const camVideo=document.createElement('video');
 camVideo.muted=true; camVideo.playsInline=true;
 
-/* ─────────── 9) شاشة التركيب (Canvas) ─────────── */
+/* ─────────── 9) شاشة التركيب + حلقة الرسم الذكية ─────────── */
 const stage=$('#stage');
 const g2=stage.getContext('2d');
 let idleCache=null;
+let dirty=true;             // هل نحتاج إطاراً جديداً في الخمول؟
+function markDirty(){ dirty=true; }
 
 function applyTargetRes(){
   let w=1920,h=1080;
@@ -1590,19 +1553,22 @@ function applyTargetRes(){
     if(screenVideo.videoWidth){ w=screenVideo.videoWidth; h=screenVideo.videoHeight; }
     else { w=1280; h=720; }
   }else{
-    [w,h]=SET.res.split('x').map(Number);
+    const parts=SET.res.split('x'); w=+parts[0]; h=+parts[1];
   }
-  /* قصور الأداء: حد أعلى للأبعاد */
-  const cap=3840*2160;
-  if(w*h>cap){ const k=Math.sqrt(cap/(w*h)); w=Math.round(w*k/2)*2; h=Math.round(h*k/2)*2; }
+  /* سقف الدقة: 1080p في الوضع الخفيف */
+  if(w*h>PERF.resCap){
+    const k=Math.sqrt(PERF.resCap/(w*h));
+    w=Math.round(w*k/2)*2; h=Math.round(h*k/2)*2;
+  }
   if(stage.width!==w||stage.height!==h){
     stage.width=Math.max(2,w); stage.height=Math.max(2,h);
-    $('#chipTargetRes').textContent=`${w}×${h}`;
+    setTxt('#chipTargetRes', `${w}×${h}`);
+    idleCache=null; markDirty();
   }
 }
 function buildIdle(){
   const c=document.createElement('canvas');
-  c.width=stage.width||1280; c.height=stage.height||720;
+  c.width=stage.width; c.height=stage.height;
   const x=c.getContext('2d');
   x.fillStyle='#0d1016'; x.fillRect(0,0,c.width,c.height);
   x.fillStyle='#171c25';
@@ -1641,10 +1607,7 @@ function drawWatermark(cx,cw,ch){
   const fs=Math.max(14, Math.round(cw/62));
   cx.font=`600 ${fs}px "IBM Plex Sans Arabic"`;
   const wTxt=cx.measureText(txt).width, m=fs*1.4;
-  const pos={
-    br:[cw-wTxt-m, ch-m], bl:[m, ch-m],
-    tr:[cw-wTxt-m, m+fs], tl:[m, m+fs],
-  }[SET.wmPos];
+  const pos={ br:[cw-wTxt-m, ch-m], bl:[m, ch-m], tr:[cw-wTxt-m, m+fs], tl:[m, m+fs] }[SET.wmPos];
   cx.globalAlpha=(SET.wmOp/100)*0.9;
   cx.fillStyle='rgba(0,0,0,.5)';
   cx.fillText(txt, pos[0]+2, pos[1]+2);
@@ -1657,23 +1620,21 @@ function drawFrame(){
   g2.fillStyle='#000'; g2.fillRect(0,0,cw,ch);
   S.frames++;
 
-  /* طبقة الشاشة */
   if(screenVideo.srcObject && screenVideo.videoWidth){
     const vw=screenVideo.videoWidth, vh=screenVideo.videoHeight;
     const k=Math.min(cw/vw, ch/vh);
     const dw=vw*k, dh=vh*k;
     g2.drawImage(screenVideo,(cw-dw)/2,(ch-dh)/2,dw,dh);
-    $('#chipRes').textContent=`${vw}×${vh}`;
+    setTxt('#chipRes', `${vw}×${vh}`);
   }else{
-    if(!idleCache||idleCache.width!==cw||idleCache.height!==ch) buildIdle();
+    if(!idleCache) buildIdle();
     g2.drawImage(idleCache,0,0);
-    $('#chipRes').textContent=`${cw}×${ch}`;
+    setTxt('#chipRes', `${cw}×${ch}`);
   }
 
-  /* كاميرا PiP */
   if(S.camStream && camVideo.videoWidth){
     const pw=S.pip.w*cw;
-    let ph=pw*camVideo.videoHeight/camVideo.videoWidth;
+    const ph=pw*camVideo.videoHeight/camVideo.videoWidth;
     let px=clamp(S.pip.x,0,1)*cw, py=clamp(S.pip.y,0,1)*ch;
     if(px+pw>cw) px=cw-pw;
     if(py+ph>ch) py=ch-ph;
@@ -1698,38 +1659,62 @@ function drawFrame(){
   if(S.active && !S.paused && SET.burn) drawBurn(g2,cw,ch,elapsed());
 }
 
-/* حلقة الرسم — rAF + مؤقّت احتياطي عند إخفاء التبويب */
-function loop(){ drawFrame(); requestAnimationFrame(loop); }
-requestAnimationFrame(loop);
-setInterval(()=>{ if(document.hidden && (S.active||screenVideo.srcObject)) drawFrame(); }, 250);
+/* ══ الحلقة الذكية ══
+   خمول تام   → رسم إطار واحد عند التغيّر فقط
+   معاينة     → PERF.previewFps (15 في الخفيف / 30 في الكامل)
+   تسجيل     → معدل الإطارات المختار (30fps = نصف جهد 60fps) */
+let lastPaint=0;
+function renderLoop(now){
+  requestAnimationFrame(renderLoop);
+  const recording = S.active && !S.paused;
+  const hasSource = !!(S.screenStream || S.camStream);
+  let interval;
+  if(recording) interval = 1000/Math.max(SET.fps,10);
+  else if(hasSource) interval = 1000/PERF.previewFps;
+  else{
+    if(dirty){ dirty=false; drawFrame(); }
+    return;
+  }
+  if(now-lastPaint < interval) return;
+  lastPaint=now;
+  drawFrame();
+}
+requestAnimationFrame(renderLoop);
+
+/* احتياط عند إخفاء التبويب: rAF يتوقف، فنرسم بمؤقّت */
+setInterval(()=>{ if(document.hidden && (S.active || S.screenStream)) drawFrame(); }, 250);
+
+/* عدّاد FPS مقاس (مرة كل ثانية، كتابة مؤقتة فقط عند التغيّر) */
+let lastFpsTxt='';
 setInterval(()=>{
   const now=performance.now(), dt=(now-S.lastFpsStamp)/1000;
   if(dt>=1){
-    $('#chipFps').textContent=Math.round(S.frames/dt)+' FPS';
+    const txt = (S.screenStream||S.active) ? Math.round(S.frames/dt)+' FPS' : '— FPS';
+    if(txt!==lastFpsTxt){ lastFpsTxt=txt; setTxt('#chipFps',txt); }
     S.frames=0; S.lastFpsStamp=now;
     if(SET.res==='auto') applyTargetRes();
   }
 },1000);
 
-/* صندوق تحكم PiP (سحب + تحجيم) */
-const pipBox=$('#pipBox');
+/* ─────────── 10) صندوق PiP ─────────── */
 function updatePipBox(nx,ny,nw,nh){
+  const box=$('#pipBox');
+  if(!(S.camStream && camVideo.videoWidth)){ box.hidden=true; return; }
+  box.hidden=false;
   const rect=$('#stageWrap').getBoundingClientRect();
   const srect=stage.getBoundingClientRect();
   const k=srect.width/stage.width;
-  const box=$('#pipBox');
-  box.hidden=!(S.camStream && camVideo.videoWidth);
   box.style.width =(nw*stage.width*k)+'px';
   box.style.height=(nh*stage.height*k)+'px';
   box.style.left  =((rect.width-srect.width)/2 + nx*stage.width*k)+'px';
   box.style.top   =((rect.height-srect.height)/2 + ny*stage.height*k)+'px';
 }
 (function pipDrag(){
+  const pipBox=$('#pipBox');
   let mode=null, sx=0, sy=0, start=null;
   pipBox.addEventListener('pointerdown',e=>{
     if(e.target===$('#pipResize')) mode='size'; else mode='move';
-    sx=e.clientX; sy=e.clientY;
-    start={...S.pip};
+    sx=e.clientX; sy=e.clientY; start={...S.pip};
     pipBox.setPointerCapture(e.pointerId);
     e.preventDefault();
   });
@@ -1748,54 +1733,52 @@ function updatePipBox(nx,ny,nw,nh){
   pipBox.addEventListener('pointercancel',()=>mode=null);
 })();
 
-/* ─────────── 10) الأجهزة: شاشة / ميكروفون / كاميرا ─────────── */
+/* ─────────── 11) الأجهزة ─────────── */
 async function pickScreen(){
   if(!displayOK){ toast('المتصفح لا يدعم التقاط الشاشة.','err'); return false; }
   try{
-    const wantH = SET.res==='auto'?{}:{width:{ideal:+SET.res.split('x')[0]},height:{ideal:+SET.res.split('x')[1]}};
+    const wantH = SET.res==='auto' ? {} :
+      {width:{ideal:+SET.res.split('x')[0]}, height:{ideal:+SET.res.split('x')[1]}};
     const stream=await navigator.mediaDevices.getDisplayMedia({
       video:{frameRate:{ideal:SET.fps, max:60}, ...wantH},
       audio:{ echoCancellation:false, noiseSuppression:false }
     });
-    /* تنظيف القديم */
     if(S.screenStream) S.screenStream.getTracks().forEach(t=>t.stop());
     S.screenStream=stream;
     screenVideo.srcObject=stream;
     await screenVideo.play().catch(()=>{});
-    applyTargetRes();
+    applyTargetRes(); markDirty();
     $('#btnReplaceSrc').disabled=false;
     setLed('ledSys', true, 'sys');
 
     const vTrack=stream.getVideoTracks()[0];
     vTrack.addEventListener('ended', ()=>{
-      /* المستخدم أوقف المشاركة من شريط المتصفح */
       if(S.active) autoStop('توقفت مشاركة الشاشة');
       else{
-        S.screenStream=null; screenVideo.srcObject=null;
+        S.screenStream=null; screenVideo.srcObject=null; S.sysTrack=null;
         $('#btnReplaceSrc').disabled=true;
         setLed('ledSys',false);
         disconnectAudio('sys');
+        idleCache=null; markDirty();
         toast('انتهت مشاركة الشاشة.','info');
       }
     });
 
-    /* صوت النظام إن سمح به المستخدم في نافذة الاختيار */
     const aTrack=stream.getAudioTracks()[0]||null;
     S.sysTrack=aTrack;
     if(aTrack){
       initAudio();
-      connectAudio('sys', aTrack.stream || stream, SET.sysGain, !mutes.sys);
+      connectAudio('sys', stream, SET.sysGain, !mutes.sys);
       toast('تم التقاط صوت النظام مع المصدر.','ok');
     }else{
       disconnectAudio('sys');
       toast('لم يُرفق صوت النظام — فعّل «مشاركة الصوت» في نافذة اختيار المصدر.','warn',null,6000);
     }
-    buildIdle=null; idleCache=null;
     return true;
   }catch(err){
     if(err && (err.name==='NotAllowedError'||err.name==='AbortError'))
       toast('تم إلغاء اختيار المصدر.','info');
-    else toast('تعذر التقاط الشاشة: '+(err&&err.message||err),'err');
+    else toast('تعذر التقاط الشاشة: '+((err&&err.message)||err),'err');
     return false;
   }
 }
@@ -1848,6 +1831,7 @@ async function enableCam(){
     await camVideo.play().catch(()=>{});
     setLed('ledCam',true,'cam');
     $('#btnCamQuick').style.color='var(--amber)';
+    markDirty();
     toast('الكاميرا مفعّلة — اسحب إطارها لتحديد موضعها.','ok');
     refreshDevices();
     return true;
@@ -1862,16 +1846,16 @@ function disableCam(){
   setLed('ledCam',false);
   $('#pipBox').hidden=true;
   $('#btnCamQuick').style.color='';
+  markDirty();
 }
  $('#btnCamQuick').onclick=()=> S.camStream?disableCam():enableCam();
 
-/* قائمة الأجهزة */
 async function refreshDevices(){
   try{
     const devs=await navigator.mediaDevices.enumerateDevices();
     const fill=(sel,kind,label)=>{
       const el=$(sel); const cur=el.value;
-      el.innerHTML=`<option value="">الافتراضي</option>`;
+      el.innerHTML='<option value="">الافتراضي</option>';
       devs.filter(d=>d.kind===kind).forEach(d=>{
         const o=document.createElement('option');
         o.value=d.deviceId; o.textContent=d.label||`${label} ${d.deviceId.slice(0,6)}`;
@@ -1885,9 +1869,9 @@ async function refreshDevices(){
 }
 if(navigator.mediaDevices) navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
 
-/* ─────────── 11) محرك مزج الصوت + VU ─────────── */
+/* ─────────── 12) مزج الصوت + VU مخفَّف ─────────── */
+const VU_SEGS=12;   /* كان 18 — تخفيف DOM وتحديثات */
 const mutes={sys:false, mic:false};
-const lastGain={sys:100, mic:100};
 function initAudio(){
   if(S.audio) return;
   const ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1902,12 +1886,11 @@ function connectAudio(kind, stream, gainVal, unmuted){
     const src=A.ctx.createMediaStreamSource(stream);
     const gain=A.ctx.createGain();
     const an=A.ctx.createAnalyser();
-    an.fftSize=512;
+    an.fftSize=256;
     gain.gain.value = unmuted? (gainVal/100) : 0;
     src.connect(an); an.connect(gain); gain.connect(A.dest);
-    A[kind]={src,gain,an, buf:new Uint8Array(an.fftSize), level:0, peak:0};
-    A[kind].gainVal=gainVal;
-  }catch(e){ console.warn('audio connect',e); }
+    A[kind]={src,gain,an, buf:new Uint8Array(an.fftSize), peak:0, gainVal};
+  }catch(e){}
 }
 function disconnectAudio(kind){
   const A=S.audio; if(!A||!A[kind]) return;
@@ -1915,43 +1898,46 @@ function disconnectAudio(kind){
   A[kind]=null;
 }
 function setGain(kind, val){
-  const A=S.audio; if(!A||!A[kind]) { lastGain[kind]=val; return; }
+  const A=S.audio;
+  if(!A||!A[kind]) return;
   A[kind].gainVal=val;
   if(!mutes[kind]) A[kind].gain.gain.value=val/100;
 }
-/* بناء مقاييس VU */
 function buildVu(el){
   el.innerHTML='';
-  for(let i=0;i<18;i++){
+  for(let i=0;i<VU_SEGS;i++){
     const s=document.createElement('i');
-    if(i>14) s.dataset.c='r'; else if(i>10) s.dataset.c='y'; else s.dataset.c='g';
+    if(i>=10) s.dataset.c='r'; else if(i>=7) s.dataset.c='y'; else s.dataset.c='g';
     el.appendChild(s);
   }
 }
 buildVu($('#vuSys')); buildVu($('#vuMic'));
-(function vuLoop(){
-  const read=(kind)=>{
-    const A=S.audio; if(!A||!A[kind]){ paintVu(kind==='sys'?'#vuSys':'#vuMic',0); return; }
-    const n=A[kind]; n.an.getByteTimeDomainData(n.buf);
+const vuState={sys:-1, mic:-1};
+function paintVu(kind, level){
+  const lit=Math.round(clamp(level,0,1)*VU_SEGS);
+  if(vuState[kind]===lit) return;       /* لا DOM write دون تغيّر */
+  vuState[kind]=lit;
+  const segs=$((kind==='sys')?'#vuSys':'#vuMic').children;
+  for(let i=0;i<VU_SEGS;i++)
+    segs[i].className = i<lit ? 'lit '+segs[i].dataset.c : '';
+}
+/* VU بمؤقّت 90ms — بدل rAF بـ 60fps */
+setInterval(()=>{
+  const A=S.audio;
+  if(!A){ paintVu('sys',0); paintVu('mic',0); return; }
+  ['sys','mic'].forEach(kind=>{
+    const n=A[kind];
+    if(!n){ paintVu(kind,0); return; }
+    n.an.getByteTimeDomainData(n.buf);
     let sum=0;
     for(let i=0;i<n.buf.length;i++){ const v=(n.buf[i]-128)/128; sum+=v*v; }
     const rms=Math.sqrt(sum/n.buf.length);
-    const lvl=Math.min(1, rms*2.4);
-    n.peak=Math.max(lvl, n.peak*0.93);   // تلاشٍ ناعم للقمة
-    paintVu(kind==='sys'?'#vuSys':'#vuMic', n.peak);
-  };
-  read('sys'); read('mic');
-  requestAnimationFrame(vuLoop);
-})();
-function paintVu(sel, level){
-  const segs=$(sel).children;
-  const lit=Math.round(level*18);
-  for(let i=0;i<18;i++){
-    const on=i<lit;
-    segs[i].className = on ? 'lit '+segs[i].dataset.c : '';
-  }
-}
-/* مقابض الفيدر */
+    n.peak=Math.max(Math.min(1, rms*2.4), n.peak*0.9);
+    paintVu(kind, n.peak);
+  });
+},90);
+
+/* الفيدرات */
 function paintRange(inp){
   const v=(inp.value-inp.min)/(inp.max-inp.min)*100;
   inp.style.background=`linear-gradient(to left, var(--red) 0 ${v}%, var(--track) ${v}% 100%)`;
@@ -1961,7 +1947,7 @@ function wireFader(inp, dbEl, kind){
   inp.value = kind==='bit'?SET.bitrate:(kind==='sys'?SET.sysGain:SET.micGain);
   const upd=()=>{
     paintRange(inp);
-    if(kind==='bit'){ $('#bitVal').textContent=inp.value+' Mbps'; return; }
+    if(kind==='bit'){ setTxt('#bitVal', inp.value+' Mbps'); return; }
     dbEl.textContent=dbLabel(+inp.value);
     if(kind==='sys'){ SET.sysGain=+inp.value; setGain('sys',+inp.value); }
     if(kind==='mic'){ SET.micGain=+inp.value; setGain('mic',+inp.value); }
@@ -1972,38 +1958,35 @@ function wireFader(inp, dbEl, kind){
 wireFader($('#fSys'), $('#dbSys'), 'sys');
 wireFader($('#fMic'), $('#dbMic'), 'mic');
 wireFader($('#fBitrate'), null, 'bit');
-/* أزرار الكتم */
+
 function toggleMute(kind, btn){
-  const A=S.audio;
   mutes[kind]=!mutes[kind];
   const muted=mutes[kind];
   btn.classList.toggle('muted', muted);
   btn.querySelector('use').setAttribute('href', muted?'#i-volume-off':'#i-speaker');
+  const A=S.audio;
   if(A && A[kind]) A[kind].gain.gain.value = muted?0:(A[kind].gainVal/100);
-  if(!A && !muted){ /* لا مصدر بعد — سيطبق عند الاتصال */ }
-  if(!muted && kind==='sys' && !S.sysTrack){ setGain('sys',SET.sysGain); }
-  if(!muted && kind==='mic' && !S.micStream) setGain('mic',SET.micGain);
 }
  $('#btnMuteSys').onclick=e=>toggleMute('sys', e.currentTarget);
  $('#btnMuteMic').onclick=e=>toggleMute('mic', e.currentTarget);
 
-/* ─────────── 12) اسم الملف القادم ─────────── */
-function nextFileName(){
-  const d=new Date();
-  const p=n=>String(n).padStart(2,'0');
-  return SET.nameTpl
-    .replace('{date}', `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`)
-    .replace('{time}', `${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`);
+/* ─────────── 13) أسماء الملفات ─────────── */
+function previewTpl(tpl){
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  return (tpl||'')
+    .replace('{date}',`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`)
+    .replace('{time}',`${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`);
 }
+const nextFileName=()=>previewTpl(SET.nameTpl);
  $('#fileNameInput').value=nextFileName();
 
-/* ─────────── 13) تدفق التسجيل ─────────── */
+/* ─────────── 14) تدفق التسجيل ─────────── */
 function updateChips(){
   const n=S.markers.length;
   $('#chipMarks').hidden=n===0;
-  $('#chipMarks').textContent=n+' MARKS';
+  if(n) setTxt('#chipMarks', n+' MARKS');
   $('#markBadge').hidden=n===0;
-  $('#markBadge').textContent=n;
+  if(n) setTxt('#markBadge', String(n));
   $('#btnMark').classList.toggle('mark-on', n>0);
 }
 function startCountdown(sec){
@@ -2034,14 +2017,11 @@ function startCountdown(sec){
 }
 async function beginRecording(){
   if(S.active) return;
-  /* اسم الملف */
   S.pendingName = $('#fileNameInput').value.trim() || nextFileName();
-  /* مصدر شاشة إن لم يوجد */
   if(!screenVideo.srcObject){
     const ok=await pickScreen();
     if(!ok) return;
   }
-  /* عدّ تنازلي */
   const go=await startCountdown(SET.countdown);
   if(!go) return;
   if(!screenVideo.srcObject){ toast('انتهت مشاركة الشاشة قبل بدء التسجيل.','warn'); return; }
@@ -2050,30 +2030,28 @@ async function beginRecording(){
 function startRecorder(){
   initAudio();
   if(S.audio.ctx.state==='suspended') S.audio.ctx.resume();
-
   applyTargetRes();
+
   const vStream=stage.captureStream(SET.fps);
   const tracks=[...vStream.getVideoTracks()];
-  const aTracks=(S.audio?S.audio.dest.stream.getAudioTracks():[]);
+  const aTracks=S.audio?S.audio.dest.stream.getAudioTracks():[];
   if(aTracks.length) tracks.push(...aTracks);
 
-  const mime=SET.mime;
   const recOpts={ videoBitsPerSecond: SET.bitrate*1000000, audioBitsPerSecond: 128000 };
   let rec;
-  try{ rec=new MediaRecorder(new MediaStream(tracks), mime?{...recOpts, mimeType:mime}:recOpts); }
+  try{ rec=new MediaRecorder(new MediaStream(tracks), {...recOpts, mimeType:SET.mime}); }
   catch(e){
     try{ rec=new MediaRecorder(new MediaStream(tracks), recOpts); }
     catch(e2){ toast('تعذر بدء المسجّل في هذا المتصفح.','err'); return; }
   }
   S.recorder=rec;
   S.chunks=[]; S.bytes=0; S.markers=[];
-  S.mimeUsed=rec.mimeType||mime||'video/webm';
-  const fmt=(S.mimeUsed.includes('vp9')?'WEBM/VP9':S.mimeUsed.includes('vp8')?'WEBM/VP8':S.mimeUsed.includes('264')?(S.mimeUsed.includes('mp4')?'MP4/H264':'WEBM/H264'):'WEBM');
-  $('#chipFmt').textContent=fmt;
+  S.mimeUsed=rec.mimeType||SET.mime;
+  setTxt('#chipFmt', fmtShort(S.mimeUsed));
 
   rec.ondataavailable=e=>{ if(e.data && e.data.size){ S.chunks.push(e.data); S.bytes+=e.data.size; } };
   rec.onstop=finalizeRecording;
-  rec.onerror=e=>{ toast('خطأ في المسجّل: '+(e.error&&e.error.name||'unknown'),'err'); };
+  rec.onerror=e=>{ toast('خطأ في المسجّل: '+((e.error&&e.error.name)||'unknown'),'err'); };
 
   rec.start(1000);
   S.active=true; S.paused=false;
@@ -2086,6 +2064,16 @@ function startRecorder(){
   toast('بدأ التسجيل — بالتوفيق!','ok');
   statsLoop();
 }
+function fmtShort(m){
+  m=m||'';
+  if(m.includes('mp4')) return 'MP4/H264';
+  if(m.includes('vp9')) return 'WEBM/VP9';
+  if(m.includes('vp8')) return 'WEBM/VP8';
+  if(m.includes('264')) return 'WEBM/H264';
+  return 'WEBM';
+}
+function extFor(mime){ return (mime||'').includes('mp4')?'.mp4':'.webm'; }
+
 function togglePause(){
   if(!S.active) return;
   if(!S.paused){
@@ -2126,13 +2114,10 @@ function stopRecording(){
   beep(520,0.18,'sine',0.18);
 }
 async function finalizeRecording(){
-  const blob=new Blob(S.chunks,{type:S.mimeUsed.split(';')[0]});
+  const blob=new Blob(S.chunks,{type:(S.mimeUsed||'video/webm').split(';')[0]});
   S.chunks=[];
   const dur=elapsed();
-  if(blob.size<1000 || dur<0.4){
-    toast('التسجيلة فارغة جداً ولم تُحفظ.','warn');
-    return;
-  }
+  if(blob.size<1000 || dur<0.4){ toast('التسجيلة فارغة جداً ولم تُحفظ.','warn'); return; }
   const thumb=await makeThumb(blob).catch(()=>'');
   const rec={
     id:uid(), name:S.pendingName, blob, thumb,
@@ -2152,36 +2137,34 @@ async function finalizeRecording(){
     toast('تعذر الحفظ في المكتبة: '+e.message,'err');
   }
 }
-function extFor(mime){
-  return (mime||'').includes('mp4')?'.mp4':'.webm';
-}
 async function makeThumb(blob){
   return new Promise((res,rej)=>{
     const v=document.createElement('video');
     v.muted=true; v.playsInline=true;
     const url=URL.createObjectURL(blob);
     v.src=url;
-    const done=(ok)=>{
+    let settled=false;
+    const done=ok=>{
+      if(settled) return; settled=true;
       try{
         const c=document.createElement('canvas');
-        c.width=320; c.height=180;
+        c.width=240; c.height=135;     /* مصغّرة أصغر = ذاكرة أقل */
         const x=c.getContext('2d');
-        x.fillStyle='#000'; x.fillRect(0,0,320,180);
+        x.fillStyle='#000'; x.fillRect(0,0,240,135);
         if(ok&&v.videoWidth){
-          const k=Math.min(320/v.videoWidth,180/v.videoHeight);
-          x.drawImage(v,(320-v.videoWidth*k)/2,(180-v.videoHeight*k)/2,v.videoWidth*k,v.videoHeight*k);
+          const k=Math.min(240/v.videoWidth,135/v.videoHeight);
+          x.drawImage(v,(240-v.videoWidth*k)/2,(135-v.videoHeight*k)/2,v.videoWidth*k,v.videoHeight*k);
         }
-        res(c.toDataURL('image/jpeg',0.72));
+        res(c.toDataURL('image/jpeg',0.7));
       }catch(e){ res(''); }
       URL.revokeObjectURL(url);
     };
-    v.onloadeddata=()=>{ v.currentTime=Math.min(0.4, (v.duration||1)/3); };
+    v.onloadeddata=()=>{ v.currentTime=Math.min(0.4,(v.duration||1)/3); };
     v.onseeked=()=>done(true);
     v.onerror=()=>done(false);
     setTimeout(()=>done(false), 3500);
   });
 }
-/* حلقة الإحصاءات أثناء التسجيل */
 let statsTimer=null;
 function statsLoop(){
   clearInterval(statsTimer);
@@ -2189,23 +2172,22 @@ function statsLoop(){
   statsTimer=setInterval(()=>{
     if(!S.active){ clearInterval(statsTimer); return; }
     const t=elapsed(), bytes=S.bytes;
-    $('#timerVal').textContent=fmtTime(t);
-    $('#statSize').textContent=fmtBytes(bytes);
-    $('#statBitrate').textContent = t>1.5 ? (bytes*8/t/1000000).toFixed(1)+' Mbps' : '— Mbps';
+    setTxt('#timerVal', fmtTime(t));
+    setTxt('#statSize', fmtBytes(bytes));
+    setTxt('#statBitrate', t>1.5 ? (bytes*8/t/1000000).toFixed(1)+' Mbps' : '— Mbps');
     if(SET.maxDur && t>=SET.maxDur*60) autoStop('بلوغ الحد الزمني');
     if(SET.maxSize && bytes>=SET.maxSize*MB) autoStop('بلوغ حد الحجم');
   },300);
 }
-/* أزرار النقل */
  $('#btnRec').onclick=()=> S.active?stopRecording():beginRecording();
  $('#btnPause').onclick=togglePause;
  $('#btnMark').onclick=addMarker;
  $('#btnFull').onclick=()=>$('#stageWrap').requestFullscreen().catch(()=>{});
  $('#btnEdFull').onclick=()=>$('#edVideo').requestFullscreen().catch(()=>{});
 
-/* ─────────── 14) المكتبة ─────────── */
+/* ─────────── 15) المكتبة ─────────── */
 async function renderLibrary(){
-  if(!S.lib.length){ S.lib=await dbAll(); }
+  if(!S.lib.length){ try{ S.lib=await dbAll(); }catch(e){} }
   let list=[...S.lib];
   if(S.libSearch) list=list.filter(r=>r.name.toLowerCase().includes(S.libSearch.toLowerCase()));
   const sorts={
@@ -2218,11 +2200,13 @@ async function renderLibrary(){
   wrap.innerHTML='';
   $('#libEmpty').hidden = S.lib.length>0;
   $('#libFoot').hidden = S.lib.length===0;
-  list.forEach(rec=>wrap.appendChild(libRow(rec)));
+  const frag=document.createDocumentFragment();   /* إدراج واحد بدل N */
+  list.forEach(rec=>frag.appendChild(libRow(rec)));
+  wrap.appendChild(frag);
   if(S.lib.length){
     const total=S.lib.reduce((s,r)=>s+r.size,0);
-    $('#libCountTxt').textContent=`${S.lib.length} RECORDINGS`;
-    $('#libTotalTxt').textContent=fmtBytes(total)+' TOTAL';
+    setTxt('#libCountTxt', `${S.lib.length} RECORDINGS`);
+    setTxt('#libTotalTxt', fmtBytes(total)+' TOTAL');
   }
 }
 function libRow(rec){
@@ -2230,17 +2214,16 @@ function libRow(rec){
   row.className='lib-row';
   row.innerHTML=`
     <div class="lib-thumb">
-      ${rec.thumb?`<img src="${rec.thumb}" alt="">`:''}
-      <span class="dur">${fmtTime(rec.duration)}</span>
+      ${rec.thumb?`<img src="${rec.thumb}" alt="" loading="lazy">`:''}
+      <span class="dur"></span>
     </div>
     <div class="lib-info">
       <h3></h3>
       <div class="lib-meta">
-        <span class="chip">${fmtBytes(rec.size)}</span>
-        <span class="chip">${rec.w}×${rec.h}</span>
-        <span class="chip">${rec.fps||30}FPS</span>
-        <span class="chip">${extFor(rec.mime).replace('.','').toUpperCase()}</span>
-        ${rec.markers&&rec.markers.length?`<span class="chip hot">${rec.markers.length} MARKS</span>`:''}
+        <span class="chip"></span>
+        <span class="chip"></span>
+        <span class="chip"></span>
+        <span class="chip"></span>
       </div>
     </div>
     <div class="lib-actions">
@@ -2249,7 +2232,13 @@ function libRow(rec){
       <button class="icon-btn" data-act="ren" title="إعادة تسمية"><svg class="ic"><use href="#i-pen"/></svg></button>
       <button class="icon-btn" data-act="del" title="حذف"><svg class="ic"><use href="#i-trash"/></svg></button>
     </div>`;
+  row.querySelector('.dur').textContent=fmtTime(rec.duration);
   row.querySelector('h3').textContent=rec.name;
+  const chips=row.querySelectorAll('.chip');
+  chips[0].textContent=fmtBytes(rec.size);
+  chips[1].textContent=`${rec.w}×${rec.h}`;
+  chips[2].textContent=(rec.fps||30)+'FPS';
+  chips[3].textContent=extFor(rec.mime).replace('.','').toUpperCase();
   row.title=fmtDate(rec.createdAt);
   row.onclick=()=>{ loadRec(rec.id); setView('editor'); };
   row.querySelectorAll('[data-act]').forEach(btn=>{
@@ -2259,12 +2248,12 @@ function libRow(rec){
       if(act==='dl') downloadBlob(rec.blob, rec.name+extFor(rec.mime));
       if(act==='ren'){
         const name=await dialog({title:'إعادة تسمية', input:'الاسم الجديد', inputVal:rec.name, ok:'حفظ'});
-        if(name){ rec.name=name; await dbAdd(rec); renderLibrary(); toast('تم تحديث الاسم.','ok'); }
+        if(name){ rec.name=name; try{await dbAdd(rec);}catch(e){} renderLibrary(); toast('تم تحديث الاسم.','ok'); }
       }
       if(act==='del'){
         const ok=await dialog({title:'حذف التسجيلة', body:`سيتم حذف «${rec.name}» نهائياً من المكتبة.`, ok:'حذف', danger:true});
         if(ok){
-          await dbDel(rec.id);
+          try{await dbDel(rec.id);}catch(e){}
           S.lib=S.lib.filter(r=>r.id!==rec.id);
           if(S.editor && S.editor.rec.id===rec.id) closeEditor();
           renderLibrary();
@@ -2278,7 +2267,7 @@ function libRow(rec){
  $('#libSearch').addEventListener('input',e=>{ S.libSearch=e.target.value.trim(); renderLibrary(); });
  $('#libSort').addEventListener('change',e=>{ S.libSort=e.target.value; renderLibrary(); });
 
-/* ─────────── 15) المحرر ─────────── */
+/* ─────────── 16) المحرر — أحداث بدل حلقة rAF ─────────── */
 const edVideo=$('#edVideo');
 function loadRec(id){
   const rec=S.lib.find(r=>r.id===id);
@@ -2287,27 +2276,25 @@ function loadRec(id){
   const url=URL.createObjectURL(rec.blob);
   edVideo.src=url;
   edVideo.load();
-  S.editor={id, url, rec, tA:0, tB:0, stopAt:null, markers:[...(rec.markers||[])]};
+  S.editor={id, url, rec, tA:0, tB:0, duration:0, stopAt:null, markers:[...(rec.markers||[])]};
   $('#edEmpty').hidden=true;
   $('#edWrap').hidden=false;
   $('#edName').textContent=rec.name;
-  $('#edMetaDur').textContent=fmtTime(rec.duration);
-  $('#edMetaSize').textContent=fmtBytes(rec.size);
-  $('#edMetaRes').textContent=`${rec.w}×${rec.h}`;
-  $('#edMetaFmt').textContent=extFor(rec.mime).replace('.','').toUpperCase()+' · '+(rec.mime||'').split(';')[1]||'';
-  $('#edMetaFmt').textContent=(rec.mime||'video/webm').replace('video/','').toUpperCase();
-  $('#edMetaDate').textContent=fmtDate(rec.createdAt);
-  $('#edMetaMarks').textContent=(S.editor.markers.length)+' علامة';
-  $('#edChipRes').textContent=`${rec.w}×${rec.h}`;
+  setTxt('#edMetaDur', fmtTime(rec.duration));
+  setTxt('#edMetaSize', fmtBytes(rec.size));
+  setTxt('#edMetaRes', `${rec.w}×${rec.h}`);
+  setTxt('#edMetaFmt', (rec.mime||'video/webm').replace('video/','').toUpperCase());
+  setTxt('#edMetaDate', fmtDate(rec.createdAt));
+  setTxt('#edChipRes', `${rec.w}×${rec.h}`);
   edVideo.onloadedmetadata=()=>{
-    S.editor.tB=edVideo.duration||rec.duration;
     S.editor.duration=edVideo.duration||rec.duration;
-    $('#edDur').textContent=fmtTime(S.editor.duration);
-    drawTimeline(); placeTrim(); placeMarks(); updateTrimReadout();
-    $('#tlEnd').textContent=fmtTime(S.editor.duration);
-    $('#tlMid').textContent=fmtTime(S.editor.duration/2);
+    S.editor.tB=S.editor.duration;
+    setTxt('#edDur', fmtTime(S.editor.duration));
+    setTxt('#tlEnd', fmtTime(S.editor.duration));
+    setTxt('#tlMid', fmtTime(S.editor.duration/2));
+    drawTimeline(); placeTrim(); placeMarks(); updateTrimReadout(); edPaint();
   };
-  drawTimeline(); placeMarks();
+  drawTimeline();
 }
 function closeEditor(keep){
   if(S.editor){ URL.revokeObjectURL(S.editor.url); }
@@ -2318,7 +2305,17 @@ function closeEditor(keep){
     edVideo.removeAttribute('src'); edVideo.load();
   }
 }
-/* تحكم التشغيل */
+/* رسم حالة المشغل — يستدعى من الأحداث فقط (timeupdate ≈ 4Hz) */
+function edPaint(){
+  if(!S.editor||!S.editor.duration) return;
+  const t=edVideo.currentTime;
+  setTxt('#edCur', fmtTime(t));
+  setTxt('#tlZoom', fmtTime(t,true));
+  $('#tlFill').style.width=(t/S.editor.duration*100)+'%';
+}
+['timeupdate','seeked','play','pause','ended','ratechange'].forEach(ev=>
+  edVideo.addEventListener(ev, edPaint));
+
  $('#edPlay').onclick=()=>{
   if(!S.editor) return;
   if(edVideo.paused){
@@ -2327,16 +2324,15 @@ function closeEditor(keep){
     edVideo.play();
   }else edVideo.pause();
 };
-edVideo.onplay=()=>$('#edPlay').querySelector('use').setAttribute('href','#i-pause');
-edVideo.onpause=()=>$('#edPlay').querySelector('use').setAttribute('href','#i-play');
-edVideo.ontimeupdate=()=>{
-  if(!S.editor) return;
-  if(S.editor.stopAt!=null && edVideo.currentTime>=S.editor.stopAt){
+edVideo.addEventListener('play',()=>$('#edPlay').querySelector('use').setAttribute('href','#i-pause'));
+edVideo.addEventListener('pause',()=>$('#edPlay').querySelector('use').setAttribute('href','#i-play'));
+edVideo.addEventListener('timeupdate',()=>{
+  if(S.editor && S.editor.stopAt!=null && edVideo.currentTime>=S.editor.stopAt){
     edVideo.pause(); S.editor.stopAt=null;
   }
-};
- $('#edBack').onclick=()=>{ if(S.editor) edVideo.currentTime=Math.max(0, edVideo.currentTime-5); };
- $('#edFwd').onclick=()=>{ if(S.editor) edVideo.currentTime=Math.min(S.editor.duration||1e9, edVideo.currentTime+5); };
+});
+ $('#edBack').onclick=()=>{ if(S.editor){ edVideo.currentTime=Math.max(0, edVideo.currentTime-5); edPaint(); } };
+ $('#edFwd').onclick=()=>{ if(S.editor){ edVideo.currentTime=Math.min(S.editor.duration||1e9, edVideo.currentTime+5); edPaint(); } };
  $$('#edSpeedSeg button').forEach(b=>b.onclick=()=>{
   $$('#edSpeedSeg button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); edVideo.playbackRate=+b.dataset.rate;
@@ -2348,87 +2344,80 @@ let edMuted=false;
   edMuted=!edMuted; edVideo.muted=edMuted;
   $('#edMute').querySelector('use').setAttribute('href', edMuted?'#i-volume-off':'#i-speaker');
 };
-/* تحديث مستمر للمشغل */
-(function edLoop(){
-  if(S.editor && S.editor.duration){
-    $('#edCur').textContent=fmtTime(edVideo.currentTime);
-    const p=edVideo.currentTime/S.editor.duration;
-    $('#tlFill').style.width=(p*100)+'%';
-    $('#tlZoom').textContent=fmtTime(edVideo.currentTime,true);
-  }
-  requestAnimationFrame(edLoop);
-})();
 
 /* الخط الزمني */
 const tlCanvas=$('#tlCanvas'), tlCtx=tlCanvas.getContext('2d');
+let tlW=0;
 function drawTimeline(){
   const body=$('#tlBody');
   const w=body.clientWidth, h=body.clientHeight;
   if(!w) return;
+  tlW=w;
   tlCanvas.width=w*devicePixelRatio;
   tlCanvas.height=h*devicePixelRatio;
   tlCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-  tlCtx.clearRect(0,0,w,h);
   tlCtx.fillStyle='#151a22';
   tlCtx.fillRect(0,0,w,h);
   if(!S.editor) return;
   const seed=[...(S.editor.rec.id||'x')].reduce((s,c)=>s+c.charCodeAt(0),0);
   const rnd=seededRand(seed);
-  const n=Math.max(40, Math.floor(w/5));
+  const n=Math.max(40, Math.floor(w/6));      /* أعمدة أقل = رسم أسرع */
   const bw=w/n;
   for(let i=0;i<n;i++){
-    const env=0.25+0.75*Math.abs(Math.sin(i/n*Math.PI*Math.PI*2.3+rnd()*0.4));
+    const env=0.25+0.75*Math.abs(Math.sin(i/n*Math.PI*2.3+rnd()*0.4));
     const bh=(0.14+rnd()*0.82)*env*(h-10);
-    tlCtx.fillStyle= i/n<=0 ? '#2a313c':'#2a313c';
+    tlCtx.fillStyle='#2a313c';
     tlCtx.fillRect(i*bw+1,(h-bh)/2,Math.max(1.5,bw-2),bh);
   }
-  /* خط منتصف */
   tlCtx.fillStyle='#20262f';
   tlCtx.fillRect(0,h/2-0.5,w,1);
 }
-new ResizeObserver(()=>{ drawTimeline(); placeTrim(); placeMarks(); }).observe($('#tlBody'));
+let rszT=null;
+new ResizeObserver(()=>{
+  clearTimeout(rszT);
+  rszT=setTimeout(()=>{ drawTimeline(); placeTrim(); placeMarks(); },90);
+}).observe($('#tlBody'));
 
-function tlX(t){ const d=S.editor&&S.editor.duration||1; return clamp(t/d,0,1)*$('#tlBody').clientWidth; }
-function tlT(x){ const d=S.editor&&S.editor.duration||1; return clamp(x/$('#tlBody').clientWidth,0,1)*d; }
-
+function tlT(x){ const d=(S.editor&&S.editor.duration)||1; return clamp(x/(tlW||1),0,1)*d; }
 function placeTrim(){
-  if(!S.editor) return;
-  const {tA,tB}=S.editor, d=S.editor.duration||1;
-  const xa=tA/d*100, xb=tB/d*100;
-  const ha=$('#tlHandleA'), hb=$('#tlHandleB');
-  ha.style.left=xa+'%'; hb.style.left=xb+'%';
-  const ma=$('#tlMaskA'), mb=$('#tlMaskB');
-  ma.style.width=xa+'%'; mb.style.width=(100-xb)+'%';
+  if(!S.editor||!S.editor.duration) return;
+  const d=S.editor.duration;
+  const xa=S.editor.tA/d*100, xb=S.editor.tB/d*100;
+  $('#tlHandleA').style.left=xa+'%';
+  $('#tlHandleB').style.left=xb+'%';
+  $('#tlMaskA').style.width=xa+'%';
+  $('#tlMaskB').style.width=(100-xb)+'%';
   updateTrimReadout();
 }
 function updateTrimReadout(){
-  if(!S.editor){ $('#trimReadout').textContent='—'; return; }
-  const {tA,tB}=S.editor;
-  $('#trimReadout').innerHTML=
-    `A ${fmtTime(tA)} → B ${fmtTime(tB)} · <em>${fmtTime(Math.max(0,tB-tA))}</em>`;
+  if(!S.editor){ setTxt('#trimReadout','—'); return; }
+  const el=$('#trimReadout');
+  el.innerHTML=`A ${fmtTime(S.editor.tA)} → B ${fmtTime(S.editor.tB)} · <em>${fmtTime(Math.max(0,S.editor.tB-S.editor.tA))}</em>`;
 }
 function placeMarks(){
+  if(!S.editor) return;
   const body=$('#tlBody');
   body.querySelectorAll('.tl-mark').forEach(m=>m.remove());
-  if(!S.editor) return;
+  if(!S.editor.duration) return;
+  const frag=document.createDocumentFragment();
   S.editor.markers.forEach((t,idx)=>{
     const m=document.createElement('div');
     m.className='tl-mark';
     m.style.left=(t/S.editor.duration*100)+'%';
     m.title='علامة '+(idx+1)+' · '+fmtTime(t);
-    m.onclick=e=>{ e.stopPropagation(); edVideo.currentTime=t; };
-    body.appendChild(m);
+    m.onclick=e=>{ e.stopPropagation(); edVideo.currentTime=t; edPaint(); };
+    frag.appendChild(m);
   });
-  $('#edMetaMarks').textContent=S.editor.markers.length+' علامة';
+  body.appendChild(frag);
+  setTxt('#edMetaMarks', S.editor.markers.length+' علامة');
 }
-/* سحب مقبضَي القص */
 function wireTrim(handle, key){
   handle.addEventListener('pointerdown',e=>{
-    if(!S.editor) return;
+    if(!S.editor||!S.editor.duration) return;
     e.preventDefault(); e.stopPropagation();
     handle.setPointerCapture(e.pointerId);
+    const rect=$('#tlBody').getBoundingClientRect();  /* قراءة واحدة قبل السحب */
     const move=ev=>{
-      const rect=$('#tlBody').getBoundingClientRect();
       const t=tlT(ev.clientX-rect.left);
       if(key==='tA') S.editor.tA=clamp(t,0,S.editor.tB-0.2);
       else S.editor.tB=clamp(t,S.editor.tA+0.2,S.editor.duration);
@@ -2440,22 +2429,19 @@ function wireTrim(handle, key){
   });
 }
 wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
-/* تمرير بالنقر والسحب */
+
  $('#tlBody').addEventListener('pointerdown',e=>{
-  if(!S.editor || e.target.closest('.tl-handle') || e.target.closest('.tl-mark')) return;
-  const seek=ev=>{
-    const rect=$('#tlBody').getBoundingClientRect();
-    edVideo.currentTime=tlT(ev.clientX-rect.left);
-  };
+  if(!S.editor || !S.editor.duration || e.target.closest('.tl-handle') || e.target.closest('.tl-mark')) return;
+  const rect=$('#tlBody').getBoundingClientRect();
+  const seek=ev=>{ edVideo.currentTime=tlT(ev.clientX-rect.left); edPaint(); };
   seek(e);
   const move=ev=>seek(ev);
   const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); };
   window.addEventListener('pointermove',move);
   window.addEventListener('pointerup',up);
 });
-/* تلميح التمرير */
  $('#tlBody').addEventListener('mousemove',e=>{
-  if(!S.editor){ return; }
+  if(!S.editor||!S.editor.duration) return;
   const rect=$('#tlBody').getBoundingClientRect();
   const tip=$('#tlTip');
   tip.style.display='block';
@@ -2464,12 +2450,13 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
 });
  $('#tlBody').addEventListener('mouseleave',()=>{ $('#tlTip').style.display='none'; });
 
-/* أزرار القص */
- $('#btnSetA').onclick=()=>{ if(S.editor){ S.editor.tA=clamp(edVideo.currentTime,0,S.editor.tB-0.2); placeTrim(); } };
- $('#btnSetB').onclick=()=>{ if(S.editor){ S.editor.tB=clamp(edVideo.currentTime,S.editor.tA+0.2,S.editor.duration); placeTrim(); } };
- $('#btnClearTrim').onclick=()=>{ if(S.editor){ S.editor.tA=0; S.editor.tB=S.editor.duration; S.editor.stopAt=null; placeTrim(); } };
+ $('#btnSetA').onclick=()=>{ if(S.editor&&S.editor.duration){ S.editor.tA=clamp(edVideo.currentTime,0,S.editor.tB-0.2); placeTrim(); } };
+ $('#btnSetB').onclick=()=>{ if(S.editor&&S.editor.duration){ S.editor.tB=clamp(edVideo.currentTime,S.editor.tA+0.2,S.editor.duration); placeTrim(); } };
+ $('#btnClearTrim').onclick=()=>{
+  if(S.editor&&S.editor.duration){ S.editor.tA=0; S.editor.tB=S.editor.duration; S.editor.stopAt=null; placeTrim(); }
+};
  $('#btnPlaySel').onclick=()=>{
-  if(!S.editor) return;
+  if(!S.editor||!S.editor.duration) return;
   S.editor.stopAt=S.editor.tB;
   edVideo.currentTime=S.editor.tA;
   edVideo.play();
@@ -2484,12 +2471,9 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
  $('#btnEdDownload').onclick=()=>{
   if(S.editor) downloadBlob(S.editor.rec.blob, S.editor.rec.name+extFor(S.editor.rec.mime));
 };
-
-/* استخراج لقطة PNG */
  $('#btnSnap').onclick=async ()=>{
   if(!S.editor) return;
-  const t=edVideo.currentTime;
-  const rec=S.editor.rec;
+  const t=edVideo.currentTime, rec=S.editor.rec;
   const v=document.createElement('video');
   v.muted=true; v.playsInline=true; v.src=URL.createObjectURL(rec.blob);
   try{
@@ -2508,24 +2492,24 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
   URL.revokeObjectURL(v.src);
 };
 
-/* قص وتصدير بإعادة ترميز حقيقية */
+/* قص وتصدير بإعادة ترميز */
  $('#btnTrimExport').onclick=async ()=>{
-  if(!S.editor) return;
+  if(!S.editor||!S.editor.duration) return;
   const {rec, tA, tB}=S.editor;
   const dur=tB-tA;
   if(dur<0.3){ toast('التحديد قصير جداً للتصدير.','warn'); return; }
   prog.show('تصدير المقطع المقصوص');
-  const token={cancelled:false};
   try{
     const v=document.createElement('video');
     v.playsInline=true; v.src=URL.createObjectURL(rec.blob);
     await new Promise((res,rej)=>{ v.onloadeddata=res; v.onerror=rej; setTimeout(rej,5000); });
 
-    /* إعادة ترميز: تشغيل المقطع ورسمه على canvas مع صوته */
     const cv=document.createElement('canvas');
     cv.width=v.videoWidth; cv.height=v.videoHeight;
     const cx=cv.getContext('2d');
-    const cStream=cv.captureStream(30);
+    cx.imageSmoothingQuality='low';            /* رسم أسرع على المعالجات الضعيفة */
+    const fpsOut=Math.min(SET.fps,30);         /* سقف 30fps في التصدير لتخفيف الحمل */
+    const cStream=cv.captureStream(fpsOut);
 
     let audioOk=false;
     try{
@@ -2538,54 +2522,57 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
       audioOk=true;
     }catch(e){ /* تصدير بدون صوت */ }
 
-    let mime=SET.mime;
     let mr;
-    try{ mr=new MediaRecorder(cStream,{mimeType:mime, videoBitsPerSecond:SET.bitrate*1000000}); }
+    try{ mr=new MediaRecorder(cStream,{mimeType:SET.mime, videoBitsPerSecond:SET.bitrate*1000000}); }
     catch(e){ mr=new MediaRecorder(cStream); }
     const chunks=[];
     mr.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
-
     const finish=()=>new Promise(res=>{ mr.onstop=res; mr.stop(); });
+
     v.currentTime=tA;
     v.muted=!audioOk;
-    mr.start(250);
+    mr.start(500);
     await v.play();
-    v.onended=()=>v._done&&v._done();
+
+    /* رسم الإطارات بمؤقّت fpsOut بدل rAF الكامل — رحمة بالمعالج */
+    let stop=false;
+    const paint=()=>{ if(stop) return; cx.drawImage(v,0,0); };
+    const paintTimer=setInterval(paint, 1000/fpsOut);
 
     await new Promise(res=>{
       let doneFlag=false;
       const done=()=>{ if(doneFlag)return; doneFlag=true; res(); };
-      v._done=done;
       const watch=()=>{
-        if(token.cancelled||prog.cancelled){ done(); return; }
+        if(prog.cancelled){ done(); return; }
         prog.set((v.currentTime-tA)/dur);
         if(v.currentTime>=tB-0.03 || v.ended){ done(); return; }
-        requestAnimationFrame(watch);
+        setTimeout(watch, 120);
       };
-      requestAnimationFrame(watch);
+      watch();
     });
+    stop=true;
+    clearInterval(paintTimer);
     v.pause();
+    paint();                       /* إطار أخير */
     await finish();
     URL.revokeObjectURL(v.src);
 
-    if(token.cancelled||prog.cancelled){
-      toast('تم إلغاء التصدير.','info');
-    }else{
-      const out=new Blob(chunks,{type:(mr.mimeType||mime).split(';')[0]});
+    if(prog.cancelled){ toast('تم إلغاء التصدير.','info'); }
+    else{
+      const out=new Blob(chunks,{type:(mr.mimeType||SET.mime).split(';')[0]});
       if(out.size>500){
-        downloadBlob(out, `${rec.name}-trimmed${extFor(mr.mimeType||mime)}`);
+        downloadBlob(out, `${rec.name}-trimmed${extFor(mr.mimeType||SET.mime)}`);
         toast(`تم تصدير المقطع: ${fmtTime(dur)} · ${fmtBytes(out.size)}`,'ok');
       }else toast('خرج التصدير فارغاً — جرّب مدة أطول.','warn');
     }
   }catch(e){
-    toast('فشل التصدير: '+(e.message||e),'err');
+    toast('فشل التصدير: '+((e&&e.message)||e),'err');
   }
   prog.hide();
 };
 
-/* ─────────── 16) ربط الإعدادات بالواجهة ─────────── */
+/* ─────────── 17) ربط الإعدادات ─────────── */
 function wireSettings(){
-  /* صيغ الترميز المتاحة */
   const mimeBox=$('#setMime');
   supportedMimes.forEach(m=>{
     const lab=document.createElement('label');
@@ -2595,7 +2582,7 @@ function wireSettings(){
       <span class="sw-txt"><b style="font:500 12px var(--mono);direction:ltr;display:inline-block">${m.label}</b></span>`;
     const inp=lab.querySelector('input');
     inp.checked = m.mime===SET.mime;
-    inp.onchange=()=>{ if(inp.checked){ SET.mime=m.mime; saveSet(); syncFmtChip(); } };
+    inp.onchange=()=>{ if(inp.checked){ SET.mime=m.mime; saveSet(); setTxt('#chipFmt', fmtShort(m.mime)); } };
     mimeBox.appendChild(lab);
   });
   if(!supportedMimes.length)
@@ -2608,16 +2595,18 @@ function wireSettings(){
   const bindTxt=(id,key,cb)=>{ const el=$(id); el.value=SET[key]||'';
     el.oninput=()=>{ SET[key]=el.value; saveSet(); cb&&cb(); }; };
 
+  bindSel('#setPerf','perf',applyPerf);
+  bindSel('#setPreviewFps','previewFps',applyPerf);
   bindSel('#setCount','countdown');
   bindSel('#setMaxDur','maxDur');
   bindSel('#setMaxSize','maxSize');
-  bindChk('#setBurn','burn',()=>{ $('#setBurnQuick').checked=SET.burn; });
+  bindChk('#setBurn','burn',()=>{ $('#setBurnQuick').checked=SET.burn; markDirty(); });
   bindChk('#setUiSounds','uiSounds');
   bindChk('#setEcho','echo',()=>restartMic());
   bindChk('#setNoise','noise',()=>restartMic());
-  bindChk('#setWmOn','wmOn');
-  bindTxt('#setWmText','wmText');
-  bindSel('#setWmPos','wmPos');
+  bindChk('#setWmOn','wmOn',markDirty);
+  bindTxt('#setWmText','wmText',markDirty);
+  bindSel('#setWmPos','wmPos',markDirty);
   bindTxt('#setNameTpl','nameTpl',()=>{
     $('#tplPrev').textContent=' مثال: '+previewTpl(SET.nameTpl);
     $('#fileNameInput').value=nextFileName();
@@ -2625,7 +2614,7 @@ function wireSettings(){
   $('#setWmOp').value=SET.wmOp;
   $('#setWmOp').addEventListener('input',e=>{
     SET.wmOp=+e.target.value; saveSet(); paintRange(e.target);
-    $('#wmOpVal').textContent=SET.wmOp+'%';
+    $('#wmOpVal').textContent=SET.wmOp+'%'; markDirty();
   });
   paintRange($('#setWmOp'));
   $('#wmOpVal').textContent=SET.wmOp+'%';
@@ -2636,11 +2625,14 @@ function wireSettings(){
   $('#setCamDev').value=SET.camDev;
   $('#setCamDev').onchange=e=>{ SET.camDev=e.target.value; saveSet(); restartCam(); };
 
-  /* مزامنة عناصر الاستوديو السريعة */
+  /* عناصر الاستوديو السريعة */
   $('#selRes').value=SET.res;
-  $('#selRes').onchange=e=>{ SET.res=e.target.value; saveSet(); applyTargetRes(); idleCache=null; };
+  $('#selRes').onchange=e=>{
+    SET.res=e.target.value; saveSet();
+    applyTargetRes(); idleCache=null; markDirty();
+  };
   $('#setBurnQuick').checked=SET.burn;
-  $('#setBurnQuick').onchange=e=>{ SET.burn=e.target.checked; saveSet(); $('#setBurn').checked=SET.burn; };
+  $('#setBurnQuick').onchange=e=>{ SET.burn=e.target.checked; saveSet(); $('#setBurn').checked=SET.burn; markDirty(); };
   $$('#segFps button').forEach(b=>{
     b.classList.toggle('on', +b.dataset.fps===SET.fps);
     b.onclick=()=>{ $$('#segFps button').forEach(x=>x.classList.remove('on'));
@@ -2652,25 +2644,27 @@ function wireSettings(){
       b.classList.add('on'); SET.countdown=+b.dataset.cd; saveSet(); };
   });
 }
-function previewTpl(tpl){
-  const d=new Date(), p=n=>String(n).padStart(2,'0');
-  return (tpl||'')
-    .replace('{date}',`${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`)
-    .replace('{time}',`${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`);
-}
-function syncFmtChip(){
-  const m=SET.mime||'';
-  $('#chipFmt').textContent = m.includes('vp9')?'WEBM/VP9': m.includes('vp8')?'WEBM/VP8':
-    m.includes('mp4')?'MP4/H264': m.includes('264')?'WEBM/H264':'WEBM';
-}
 function restartMic(){ if(S.micStream){ disableMic(); enableMic(); } }
 function restartCam(){ if(S.camStream){ disableCam(); enableCam(); } }
 
-/* ─────────── 17) اختصارات لوحة المفاتيح ─────────── */
+/* ─────────── 18) نغمات الواجهة والاختصارات ─────────── */
+let uiCtx=null;
+function beep(freq=880, dur=0.07, type='sine', gain=0.14){
+  if(!SET.uiSounds) return;
+  try{
+    uiCtx = uiCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if(uiCtx.state==='suspended') uiCtx.resume();
+    const o=uiCtx.createOscillator(), g=uiCtx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(gain, uiCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, uiCtx.currentTime+dur);
+    o.connect(g).connect(uiCtx.destination);
+    o.start(); o.stop(uiCtx.currentTime+dur+0.02);
+  }catch(e){}
+}
 document.addEventListener('keydown',e=>{
-  const typing = e.target.matches('input,select,textarea') || e.target.isContentEditable;
-  /* Esc يلغي العدّ التنازلي */
   if(e.key==='Escape' && $('#cdOv').classList.contains('on')){ $('#cdCancel').click(); return; }
+  const typing = e.target.matches('input,select,textarea') || e.target.isContentEditable;
   if(typing) return;
   const k=e.key.toLowerCase();
   if(k==='r'){ e.preventDefault(); S.active?stopRecording():beginRecording(); }
@@ -2680,16 +2674,14 @@ document.addEventListener('keydown',e=>{
     else if(S.view==='editor' && S.editor) $('#edPlay').click();
   }
   else if(k==='m'){ if(S.active) addMarker(); else if(S.editor) $('#btnEdMark').click(); }
-  else if(['1','2','3','4'].includes(k)){
-    setView(['studio','library','editor','settings'][+k-1]);
-  }
+  else if(['1','2','3','4'].includes(k)) setView(['studio','library','editor','settings'][+k-1]);
 });
 
-/* ─────────── 18) الإقلاع ─────────── */
+/* ─────────── 19) الإقلاع ─────────── */
 (async function boot(){
   setStateBadge('idle');
   wireSettings();
-  syncFmtChip();
+  applyPerf();                 /* كشف الجهاز وتطبيق الوضع المناسب */
   applyTargetRes();
   drawFrame();
   refreshDevices();
