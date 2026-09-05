@@ -10,10 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
-   REC·STUDIO — نسخة خفيفة للأجهزة الضعيفة
-   · خلفيات صلبة صريحة لكل مشهد (إصلاح الشفافية)
-   · لا backdrop-filter · لا ظلال ثقيلة · حركات مقتصدة
-   · وضع perf-light تلقائي للأجهزة الضعيفة
+   REC·STUDIO — نسخة مُصلَحة ومحسَّنة للأجهزة الضعيفة
+   الإصلاحات الجوهرية:
+   · حفظ مدة التسجيلة لحظة الإيقاف (قبل إطفاء الحالة)
+   · وضع التقاط مباشر: تسجيل مسار الشاشة كما هو — لا يتجمد
+     حتى لو كانت نافذة الموقع مخفية خلف التطبيق المُسجَّل
+   · رسّام خلفي مدفوع بخيط الصوت لوضع التركيب (كانفس)
+   · flush البيانات بـ requestData() قبل stop()
+   · إصلاح مدة WebM اللانهائية في المحرر
    ================================================================ */
 :root{
   --bg:#0b0d11;
@@ -38,7 +42,6 @@
   --r-lg:14px;
   --shadow-pop:0 8px 24px rgba(0,0,0,.45);
 }
-/* الوضع الخفيف: بلا نقاط، بلا ظلال، بلا هالات */
 body.perf-light{--shadow-pop:none}
 body.perf-light .bg-dots{display:none}
 body.perf-light .rec-btn::after{display:none}
@@ -147,21 +150,14 @@ main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;backg
 }
 .support-badge.bad{color:var(--red);border-color:rgba(255,75,62,.4)}
 
-/* ═══════════════════════════════════════════════════
-   الإصلاح الجوهري: الخلفية الصلبة لمنطقة المشاهد
-   كل مشهد (مكتبة/محرر/إعدادات) يقف فوق خلفية صلبة
-   مؤكدة — لا شفافية نهائياً مهما كان المتصفح.
-   ═══════════════════════════════════════════════════ */
-.views{
-  flex:1;overflow:hidden;position:relative;
-  background:var(--bg);                 /* الطبقة الصلبة */
-}
-.bg-dots{                                /* نمط النقاط فوق الصلبة فقط */
+/* ═══ الإصلاح: خلفية صلبة صريحة لمنطقة المشاهد ═══ */
+.views{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.bg-dots{
   position:absolute;inset:0;z-index:0;pointer-events:none;
   background-image:radial-gradient(var(--bg-dots) 1px, transparent 1px);
   background-size:22px 22px;
 }
-.views > .view{z-index:1}                /* المشاهد فوق النقاط */
+.views > .view{z-index:1}
 .view{position:absolute;inset:0;overflow-y:auto;padding:22px;display:none}
 .view.on{display:block;animation:viewIn .18s ease}
 @keyframes viewIn{from{opacity:0}to{opacity:1}}
@@ -204,6 +200,7 @@ body.is-paused .rec-lamp i{background:var(--amber)}
   color:var(--ink-2);background:var(--panel);white-space:nowrap;
 }
 .chip.hot{color:var(--red);border-color:rgba(255,75,62,.4)}
+.chip.ok{color:var(--green);border-color:rgba(61,214,140,.4)}
 .mon-actions{margin-inline-start:auto;display:flex;gap:6px}
 .icon-btn{
   width:32px;height:32px;border-radius:var(--r-sm);
@@ -232,7 +229,7 @@ canvas#stage{display:block;width:100%;height:100%;background:#000}
 }
 body.is-recording .pip-box{opacity:0;pointer-events:none}
 
-/* غطاء العدّ التنازلي — بلا blur */
+/* غطاء العدّ التنازلي */
 .cd-ov{
   position:absolute;inset:0;z-index:5;display:none;
   background:rgba(8,10,14,.92);
@@ -345,7 +342,6 @@ body.is-paused .tp-timer{color:var(--amber)}
   border:1px solid #4a5462;cursor:ew-resize;
 }
 .fader .db{font:500 10px var(--mono);color:var(--ink-3);direction:ltr;position:absolute;inset-inline-end:0;top:-16px}
-/* مقياس VU: 12 قطعة فقط (كان 18) */
 .vu{
   width:26px;height:118px;flex:none;
   display:flex;flex-direction:column-reverse;gap:3px;
@@ -582,7 +578,7 @@ kbd{
 .toast.out{animation:toastOut .2s ease forwards}
 @keyframes toastOut{to{opacity:0}}
 
-/* ============ النوافذ — بلا backdrop-filter ============ */
+/* ============ النوافذ ============ */
 .modal-back{
   position:fixed;inset:0;z-index:150;background:rgba(6,8,12,.8);
   display:none;place-items:center;padding:20px;
@@ -637,7 +633,6 @@ kbd{
 <!-- ============ مكتبة الأيقونات ============ -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="i-disc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
   <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 10l5-3v10l-5-3"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></symbol>
@@ -661,8 +656,6 @@ kbd{
   <symbol id="i-skip-fwd" viewBox="0 0 24 24"><path d="M5 5v14l11-7zM19 5v14"/></symbol>
   <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
   <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9l5 6M21 9l-5 6"/></symbol>
-  <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.1M10 10h.1M14 10h.1M18 10h.1M6 14h.1M18 14h.1M9 14h6"/></symbol>
-  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></symbol>
 </svg>
 
 <!-- ============ هيكل التطبيق ============ -->
@@ -709,7 +702,6 @@ kbd{
       متصفحك لا يدعم التقاط الشاشة (getDisplayMedia). استخدم Chrome أو Edge أو Firefox حديثاً لتفعيل كل الميزات.
     </div>
 
-    <!-- الخلفية الصلبة + المشاهد فوقها -->
     <div class="views">
       <div class="bg-dots" aria-hidden="true"></div>
 
@@ -722,6 +714,7 @@ kbd{
               <div class="rec-lamp"><i></i><span id="recLampTxt">STANDBY</span></div>
               <span class="chip" id="chipRes">— × —</span>
               <span class="chip" id="chipFps">— FPS</span>
+              <span class="chip ok" id="chipMode" hidden>DIRECT</span>
               <span class="chip hot" id="chipMarks" hidden>0 MARKS</span>
               <div class="mon-actions">
                 <button class="icon-btn" id="btnReplaceSrc" title="استبدال مصدر الشاشة" disabled>
@@ -891,7 +884,7 @@ kbd{
               <label class="switch">
                 <input type="checkbox" id="setBurnQuick">
                 <span class="sw-track"></span>
-                <span class="sw-txt"><b>حرق مؤشر REC داخل الفيديو</b><small>يُرسم وقت التسجيل في زاوية الملف الناتج نفسه</small></span>
+                <span class="sw-txt"><b>حرق مؤشر REC داخل الفيديو</b><small>يُرسم وقت التسجيل في زاوية الملف الناتج نفسه — يستخدم وضع التركيب</small></span>
               </label>
             </div>
           </div>
@@ -1072,7 +1065,6 @@ kbd{
       <section class="view" id="view-settings">
         <div class="set-grid">
 
-          <!-- الأداء أولاً -->
           <div class="module">
             <div class="module-head"><b>الأداء</b><code>PERFORMANCE</code></div>
             <div class="module-body">
@@ -1097,9 +1089,8 @@ kbd{
                 </div>
               </div>
               <p class="hint">
-                الوضع الخفيف: يعطّل نقاط الخلفية والظلال والهالات، يحدّ الدقة بـ 1080p،
-                ويخفض تحديث المعاينة — مصمم خصيصاً لمعالجات مثل Core i3 واللابتوبات الضعيفة.
-                أثناء التسجيل يرسم المحرك بمعدل الإطارات المختار نفسه (وليس 60 دائماً) لتوفير المعالج.
+                الوضع الخفيف: يعطّل نقاط الخلفية والظلال والهالات، يحدّ الدقة والالتقاط بـ 1080p/30fps،
+                ويخفض تحديث المعاينة — مصمم لمعالجات مثل Core i3 واللابتوبات الضعيفة.
               </p>
             </div>
           </div>
@@ -1283,14 +1274,20 @@ kbd{
 <script>
 'use strict';
 /* ════════════════════════════════════════════════════════════════
-   REC·STUDIO — نسخة محسَّنة للأجهزة الضعيفة
-   أهم مبدأ أدائي هنا:
-   · حلقة رسم واحدة ذكية: خمول=رسم مرة، معاينة=معدل منخفض،
-     تسجيل=معدل الإطارات المختار (ليس 60 دائماً)
-   · VU بمؤقّت 90ms (وليس rAF) و12 قطعة فقط
-   · المحرر يعمل بأحداث timeupdate (وليس حلقة rAF دائمة)
-   · لا backdrop-filter، ظلال شبه معدومة، DOM writes مؤقتة
+   REC·STUDIO — نسخة مُصلَحة
+   ★ الإصلاح الجوهري لـ«التسجيلة فارغة جداً»:
+     كان stopRecording يضبط S.active=false قبل حساب المدة،
+     و elapsed() تعيد 0 عند S.active=false → فحص (dur<0.4)
+     يرفض كل تسجيلة فوراً. الحل: حفظ المدة لحظة الإيقاف أولاً.
+   ★ إضافات موثوقية:
+     · وضع التقاط مباشر (DIRECT): يسجّل مسار الشاشة نفسه —
+       يستمر بسرعة المصدر حتى لو كانت نافذة الموقع في الخلفية
+     · رسّام خلفي مدفوع بخيط الصوت (ScriptProcessor) لوضع
+       التركيب — لا يتجمد عند إخفاء التبويب
+     · requestData() قبل stop() لتصريف آخر البيانات
+     · إصلاح مدة WebM اللانهائية في المحرر (خدعة القفز الزمني)
    ════════════════════════════════════════════════════════════════ */
+const TITLE_BASE = document.title;
 
 /* ─────────── 1) أدوات عامة ─────────── */
 const $  = s => document.querySelector(s);
@@ -1328,7 +1325,7 @@ function downloadBlob(blob, name){
   a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
 }
-/* كتابة نص مؤقتة — لا نلمس DOM إن لم تتغير القيمة */
+/* كتابة نصوص مؤقتة — لا DOM write دون تغيّر */
 const txtCache=new Map();
 function setTxt(sel, val){
   if(txtCache.get(sel)===val) return;
@@ -1425,17 +1422,16 @@ try{
 }catch(e){}
 function saveSet(){ try{localStorage.setItem('recstudio-set', JSON.stringify(SET));}catch(e){} }
 
-/* كشف قوة الجهاز: i3 (≤4 أنوية منطقية) أو رامات ≤4GB → خفيف */
+/* كشف الجهاز الضعيف: i3 (≤4 أنوية) أو رامات ≤4GB أو 8 خيوط مع ≤8GB */
 function detectWeakDevice(){
-  const cores = navigator.hardwareConcurrency || 4;
-  const mem   = navigator.deviceMemory || 4;   // جيجابايت (كروم)
-  return cores<=4 || mem<=4;
+  const cores = navigator.hardwareConcurrency || 8;
+  const mem = (typeof navigator.deviceMemory==='number') ? navigator.deviceMemory : null;
+  if(cores<=4) return true;
+  if(mem!=null && mem<=4) return true;
+  if(cores<=8 && mem!=null && mem<=8) return true;
+  return false;
 }
-const PERF={
-  light:false,
-  previewFps:30,     // معدل رسم المعاينة
-  resCap:3840*2160,  // سقف دقة الكانفس
-};
+const PERF={ light:false, previewFps:30, resCap:3840*2160 };
 function applyPerf(){
   const want = SET.perf==='auto' ? detectWeakDevice() : (SET.perf==='light');
   PERF.light = want;
@@ -1445,12 +1441,13 @@ function applyPerf(){
   PERF.resCap = want ? 1920*1080 : 3840*2160;
   const tag=$('#perfNow');
   tag.className='perf-now '+(want?'light':'full');
-  tag.textContent = want
-    ? `LIGHT MODE · ${navigator.hardwareConcurrency||'?'} CORES · ${navigator.deviceMemory||'?'}GB`
-    : `FULL MODE · ${navigator.hardwareConcurrency||'?'} CORES`;
+  tag.textContent = `MODE:${want?'LIGHT':'FULL'} · ${navigator.hardwareConcurrency||'?'}T`+
+    (typeof navigator.deviceMemory==='number'?` · ${navigator.deviceMemory}GB`:'');
   applyTargetRes();
   markDirty();
 }
+/* معدل إطارات التسجيل الفعلي (سقف 30 في الوضع الخفيف) */
+const recFps = ()=> PERF.light ? Math.min(SET.fps,30) : SET.fps;
 
 /* ─────────── 4) الحالة العامة ─────────── */
 const S={
@@ -1459,8 +1456,11 @@ const S={
   micStream:null, camStream:null,
   audio:null,
   recorder:null, chunks:[], bytes:0,
-  active:false, paused:false,
+  active:false, paused:false, countingDown:false,
   t0:0, pausedAt:0, pausedTotal:0,
+  finalDur:0,        /* ★ المدة المحفوظة لحظة الإيقاف — قلب الإصلاح */
+  finalizing:false,
+  recMode:null,      /* 'direct' | 'canvas' */
   markers:[],
   mimeUsed:null, pendingName:'',
   frames:0, lastFpsStamp:performance.now(),
@@ -1470,7 +1470,7 @@ const S={
   pip:{x:0.72, y:0.69, w:0.22},
 };
 function elapsed(){
-  if(!S.active) return 0;
+  if(!S.active) return S.finalDur;    /* بعد الإيقاف: آخر مدة محفوظة */
   const now = S.paused ? S.pausedAt : performance.now();
   return (now - S.t0 - S.pausedTotal)/1000;
 }
@@ -1534,6 +1534,11 @@ if(!displayOK){
   $('#supportBadge').classList.add('bad');
 }
 
+/* تحذير عند محاولة إغلاق الصفحة أثناء التسجيل */
+window.addEventListener('beforeunload', e=>{
+  if(S.active){ e.preventDefault(); e.returnValue=''; }
+});
+
 /* ─────────── 8) عناصر وسائط خفية ─────────── */
 const screenVideo=document.createElement('video');
 screenVideo.muted=true; screenVideo.playsInline=true;
@@ -1544,7 +1549,7 @@ camVideo.muted=true; camVideo.playsInline=true;
 const stage=$('#stage');
 const g2=stage.getContext('2d');
 let idleCache=null;
-let dirty=true;             // هل نحتاج إطاراً جديداً في الخمول؟
+let dirty=true;
 function markDirty(){ dirty=true; }
 
 function applyTargetRes(){
@@ -1555,7 +1560,6 @@ function applyTargetRes(){
   }else{
     const parts=SET.res.split('x'); w=+parts[0]; h=+parts[1];
   }
-  /* سقف الدقة: 1080p في الوضع الخفيف */
   if(w*h>PERF.resCap){
     const k=Math.sqrt(PERF.resCap/(w*h));
     w=Math.round(w*k/2)*2; h=Math.round(h*k/2)*2;
@@ -1656,20 +1660,20 @@ function drawFrame(){
   }
 
   if(SET.wmOn) drawWatermark(g2,cw,ch);
-  if(S.active && !S.paused && SET.burn) drawBurn(g2,cw,ch,elapsed());
+  if(S.active && !S.paused && SET.burn && S.recMode==='canvas') drawBurn(g2,cw,ch,elapsed());
 }
 
 /* ══ الحلقة الذكية ══
-   خمول تام   → رسم إطار واحد عند التغيّر فقط
-   معاينة     → PERF.previewFps (15 في الخفيف / 30 في الكامل)
-   تسجيل     → معدل الإطارات المختار (30fps = نصف جهد 60fps) */
+   خمول  → إطار عند التغيّر فقط
+   معاينة → معدل منخفض
+   تسجيل كانفس → معدل الإطارات المختار */
 let lastPaint=0;
 function renderLoop(now){
   requestAnimationFrame(renderLoop);
-  const recording = S.active && !S.paused;
+  const recording = S.active && !S.paused && S.recMode==='canvas';
   const hasSource = !!(S.screenStream || S.camStream);
   let interval;
-  if(recording) interval = 1000/Math.max(SET.fps,10);
+  if(recording) interval = 1000/recFps();
   else if(hasSource) interval = 1000/PERF.previewFps;
   else{
     if(dirty){ dirty=false; drawFrame(); }
@@ -1681,18 +1685,49 @@ function renderLoop(now){
 }
 requestAnimationFrame(renderLoop);
 
-/* احتياط عند إخفاء التبويب: rAF يتوقف، فنرسم بمؤقّت */
-setInterval(()=>{ if(document.hidden && (S.active || S.screenStream)) drawFrame(); }, 250);
+/* ★ الرسّام الخلفي: يرسم من خيط الصوت عندما يكون التبويب مخفياً
+   (مؤقّتات الخلفية مخنوقة لثانية واحدة، لكن callbacks الصوت لا تُخنق) */
+let bgPainter=null;
+function startBgPainter(){
+  stopBgPainter();
+  try{
+    initAudio();
+    const ctx=S.audio.ctx;
+    if(ctx.state==='suspended') ctx.resume();
+    if(!ctx.createScriptProcessor) return;
+    const sp=ctx.createScriptProcessor(512,1,1);
+    let last=0;
+    sp.onaudioprocess=()=>{
+      if(!document.hidden) return;         /* المرئي يتكفل به rAF */
+      const now=performance.now();
+      const step=1000/recFps();
+      if(now-last >= step){ last=now; drawFrame(); }
+    };
+    const mute=ctx.createGain(); mute.gain.value=0;
+    sp.connect(mute).connect(ctx.destination);
+    bgPainter={sp,mute};
+  }catch(e){}
+}
+function stopBgPainter(){
+  if(!bgPainter) return;
+  try{ bgPainter.sp.onaudioprocess=null; bgPainter.sp.disconnect(); bgPainter.mute.disconnect(); }catch(e){}
+  bgPainter=null;
+}
+/* احتياط أخير إذا لم يتوفر ScriptProcessor */
+setInterval(()=>{ if(document.hidden && S.active && !S.paused && S.recMode==='canvas') drawFrame(); }, 250);
 
-/* عدّاد FPS مقاس (مرة كل ثانية، كتابة مؤقتة فقط عند التغيّر) */
+/* عدّاد FPS مقاس */
 let lastFpsTxt='';
 setInterval(()=>{
   const now=performance.now(), dt=(now-S.lastFpsStamp)/1000;
   if(dt>=1){
-    const txt = (S.screenStream||S.active) ? Math.round(S.frames/dt)+' FPS' : '— FPS';
-    if(txt!==lastFpsTxt){ lastFpsTxt=txt; setTxt('#chipFps',txt); }
+    const directLive = S.active && S.recMode==='direct';
+    if(!directLive){
+      const txt=(S.screenStream||S.camStream)?Math.round(S.frames/dt)+' FPS':'— FPS';
+      if(txt!==lastFpsTxt){ lastFpsTxt=txt; setTxt('#chipFps',txt); }
+    }
     S.frames=0; S.lastFpsStamp=now;
-    if(SET.res==='auto') applyTargetRes();
+    if(SET.res==='auto' && S.recMode!=='direct') applyTargetRes();
   }
 },1000);
 
@@ -1737,10 +1772,15 @@ function updatePipBox(nx,ny,nw,nh){
 async function pickScreen(){
   if(!displayOK){ toast('المتصفح لا يدعم التقاط الشاشة.','err'); return false; }
   try{
-    const wantH = SET.res==='auto' ? {} :
-      {width:{ideal:+SET.res.split('x')[0]}, height:{ideal:+SET.res.split('x')[1]}};
+    let wantH;
+    if(SET.res==='auto'){
+      /* الوضع الخفيف: اطلب سقف 1080p من المصدر نفسه لتخفيف الترميز */
+      wantH = PERF.light ? {width:{ideal:1920},height:{ideal:1080}} : {};
+    }else{
+      wantH={width:{ideal:+SET.res.split('x')[0]}, height:{ideal:+SET.res.split('x')[1]}};
+    }
     const stream=await navigator.mediaDevices.getDisplayMedia({
-      video:{frameRate:{ideal:SET.fps, max:60}, ...wantH},
+      video:{frameRate:{ideal:recFps(), max:60}, ...wantH},
       audio:{ echoCancellation:false, noiseSuppression:false }
     });
     if(S.screenStream) S.screenStream.getTracks().forEach(t=>t.stop());
@@ -1832,7 +1872,10 @@ async function enableCam(){
     setLed('ledCam',true,'cam');
     $('#btnCamQuick').style.color='var(--amber)';
     markDirty();
-    toast('الكاميرا مفعّلة — اسحب إطارها لتحديد موضعها.','ok');
+    if(S.active && S.recMode==='direct')
+      toast('الكاميرا تظهر في المعاينة وستُسجَّل بدءاً من التسجيلة القادمة (التسجيل الجاري مباشر بدون تركيب).','warn',null,6500);
+    else
+      toast('الكاميرا مفعّلة — اسحب إطارها لتحديد موضعها.','ok');
     refreshDevices();
     return true;
   }catch(err){
@@ -1869,14 +1912,16 @@ async function refreshDevices(){
 }
 if(navigator.mediaDevices) navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
 
-/* ─────────── 12) مزج الصوت + VU مخفَّف ─────────── */
-const VU_SEGS=12;   /* كان 18 — تخفيف DOM وتحديثات */
+/* ─────────── 12) مزج الصوت + VU ─────────── */
+const VU_SEGS=12;
 const mutes={sys:false, mic:false};
 function initAudio(){
   if(S.audio) return;
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const dest=ctx.createMediaStreamDestination();
-  S.audio={ctx,dest,sys:null,mic:null};
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const dest=ctx.createMediaStreamDestination();
+    S.audio={ctx,dest,sys:null,mic:null};
+  }catch(e){ S.audio=null; }
 }
 function connectAudio(kind, stream, gainVal, unmuted){
   const A=S.audio; if(!A) return;
@@ -1915,13 +1960,12 @@ buildVu($('#vuSys')); buildVu($('#vuMic'));
 const vuState={sys:-1, mic:-1};
 function paintVu(kind, level){
   const lit=Math.round(clamp(level,0,1)*VU_SEGS);
-  if(vuState[kind]===lit) return;       /* لا DOM write دون تغيّر */
+  if(vuState[kind]===lit) return;
   vuState[kind]=lit;
   const segs=$((kind==='sys')?'#vuSys':'#vuMic').children;
   for(let i=0;i<VU_SEGS;i++)
     segs[i].className = i<lit ? 'lit '+segs[i].dataset.c : '';
 }
-/* VU بمؤقّت 90ms — بدل rAF بـ 60fps */
 setInterval(()=>{
   const A=S.audio;
   if(!A){ paintVu('sys',0); paintVu('mic',0); return; }
@@ -1937,7 +1981,6 @@ setInterval(()=>{
   });
 },90);
 
-/* الفيدرات */
 function paintRange(inp){
   const v=(inp.value-inp.min)/(inp.max-inp.min)*100;
   inp.style.background=`linear-gradient(to left, var(--red) 0 ${v}%, var(--track) ${v}% 100%)`;
@@ -1980,7 +2023,7 @@ function previewTpl(tpl){
 const nextFileName=()=>previewTpl(SET.nameTpl);
  $('#fileNameInput').value=nextFileName();
 
-/* ─────────── 14) تدفق التسجيل ─────────── */
+/* ─────────── 14) تدفق التسجيل (المُصلَح) ─────────── */
 function updateChips(){
   const n=S.markers.length;
   $('#chipMarks').hidden=n===0;
@@ -1988,6 +2031,12 @@ function updateChips(){
   $('#markBadge').hidden=n===0;
   if(n) setTxt('#markBadge', String(n));
   $('#btnMark').classList.toggle('mark-on', n>0);
+}
+function updateModeChip(){
+  const c=$('#chipMode');
+  if(!S.recMode){ c.hidden=true; return; }
+  c.hidden=false;
+  setTxt('#chipMode', S.recMode==='direct' ? 'DIRECT' : 'CANVAS');
 }
 function startCountdown(sec){
   return new Promise(res=>{
@@ -2016,42 +2065,72 @@ function startCountdown(sec){
   });
 }
 async function beginRecording(){
-  if(S.active) return;
+  if(S.active || S.countingDown) return;
   S.pendingName = $('#fileNameInput').value.trim() || nextFileName();
   if(!screenVideo.srcObject){
     const ok=await pickScreen();
     if(!ok) return;
   }
+  S.countingDown=true;
   const go=await startCountdown(SET.countdown);
+  S.countingDown=false;
   if(!go) return;
-  if(!screenVideo.srcObject){ toast('انتهت مشاركة الشاشة قبل بدء التسجيل.','warn'); return; }
+  if(!S.screenStream || !S.screenStream.getVideoTracks().some(t=>t.readyState==='live')){
+    toast('انتهت مشاركة الشاشة قبل بدء التسجيل.','warn');
+    return;
+  }
   startRecorder();
 }
 function startRecorder(){
   initAudio();
-  if(S.audio.ctx.state==='suspended') S.audio.ctx.resume();
-  applyTargetRes();
+  if(S.audio && S.audio.ctx.state==='suspended') S.audio.ctx.resume();
 
-  const vStream=stage.captureStream(SET.fps);
-  const tracks=[...vStream.getVideoTracks()];
-  const aTracks=S.audio?S.audio.dest.stream.getAudioTracks():[];
-  if(aTracks.length) tracks.push(...aTracks);
-
-  const recOpts={ videoBitsPerSecond: SET.bitrate*1000000, audioBitsPerSecond: 128000 };
-  let rec;
-  try{ rec=new MediaRecorder(new MediaStream(tracks), {...recOpts, mimeType:SET.mime}); }
-  catch(e){
-    try{ rec=new MediaRecorder(new MediaStream(tracks), recOpts); }
-    catch(e2){ toast('تعذر بدء المسجّل في هذا المتصفح.','err'); return; }
+  /* ★ اختيار وضع التسجيل:
+     · مباشر (DIRECT): نسجّل مسار فيديو الشاشة كما هو — أسرع وأخف
+       ويستمر بالسرعة الكاملة حتى لو كانت نافذة الموقع مخفية.
+     · تركيب (CANVAS): عند كاميرا/علامة مائية/حرق REC — نمر عبر
+       الكانفس مع الرسّام الخلفي ليبقى حياً في الخلفية. */
+  const composite = !!(S.camStream || SET.wmOn || SET.burn);
+  let vTrack=null;
+  if(!composite && S.screenStream.getVideoTracks().length){
+    S.recMode='direct';
+    vTrack=S.screenStream.getVideoTracks()[0];
+  }else{
+    if(!stage.captureStream){ toast('المتصفح لا يدعم تسجيل الكانفس المركّب.','err'); return; }
+    S.recMode='canvas';
+    applyTargetRes();
+    drawFrame();                     /* إطار قبل الالتقاط حتى لا يبدأ المسار فارغاً */
+    vTrack=stage.captureStream(recFps()).getVideoTracks()[0];
+    startBgPainter();
   }
+  updateModeChip();
+
+  const tracks=[vTrack];
+  /* مسار صوتي دائماً (وإن كان صامتاً): يسمح بضم الميكروفون
+     في منتصف التسجيل حتى في الوضع المباشر */
+  if(S.audio) tracks.push(...S.audio.dest.stream.getAudioTracks());
+
+  const recOpts={videoBitsPerSecond: SET.bitrate*1000000, audioBitsPerSecond:128000};
+  const tryMake=opts=>{ try{ return new MediaRecorder(new MediaStream(tracks), opts); }catch(e){ return null; } };
+  let rec=(SET.mime? tryMake({...recOpts, mimeType:SET.mime}) : null) || tryMake(recOpts);
+  if(!rec){ toast('تعذر بدء المسجّل في هذا المتصفح.','err'); stopBgPainter(); S.recMode=null; updateModeChip(); return; }
+
   S.recorder=rec;
-  S.chunks=[]; S.bytes=0; S.markers=[];
-  S.mimeUsed=rec.mimeType||SET.mime;
+  S.chunks=[]; S.bytes=0; S.markers=[]; S.finalDur=0; S.finalizing=false;
+  S.mimeUsed=rec.mimeType||SET.mime||'video/webm';
   setTxt('#chipFmt', fmtShort(S.mimeUsed));
+  if(S.recMode==='direct'){
+    const st=vTrack.getSettings?vTrack.getSettings():{};
+    if(st.width) setTxt('#chipTargetRes', `${st.width}×${st.height}`);
+    setTxt('#chipFps', st.frameRate?Math.round(st.frameRate)+' FPS':'SOURCE');
+  }
 
   rec.ondataavailable=e=>{ if(e.data && e.data.size){ S.chunks.push(e.data); S.bytes+=e.data.size; } };
   rec.onstop=finalizeRecording;
-  rec.onerror=e=>{ toast('خطأ في المسجّل: '+((e.error&&e.error.name)||'unknown'),'err'); };
+  rec.onerror=e=>{
+    toast('خطأ في المسجّل: '+((e.error&&e.error.name)||'unknown'),'err');
+    if(S.active) stopRecording();
+  };
 
   rec.start(1000);
   S.active=true; S.paused=false;
@@ -2061,7 +2140,7 @@ function startRecorder(){
   $('#btnMark').disabled=false;
   $('#fileNameInput').disabled=true;
   updateChips();
-  toast('بدأ التسجيل — بالتوفيق!','ok');
+  toast('بدأ التسجيل — بالتوفيق! ('+(S.recMode==='direct'?'التقاط مباشر':'تركيب كانفس')+')','ok');
   statsLoop();
 }
 function fmtShort(m){
@@ -2077,13 +2156,13 @@ function extFor(mime){ return (mime||'').includes('mp4')?'.mp4':'.webm'; }
 function togglePause(){
   if(!S.active) return;
   if(!S.paused){
-    S.recorder.pause();
+    try{ S.recorder.pause(); }catch(e){}
     S.paused=true; S.pausedAt=performance.now();
     setStateBadge('paused');
     $('#btnPause').querySelector('use').setAttribute('href','#i-play');
     toast('إيقاف مؤقت.','info',null,2200);
   }else{
-    S.recorder.resume();
+    try{ S.recorder.resume(); }catch(e){}
     S.pausedTotal+=performance.now()-S.pausedAt;
     S.paused=false;
     setStateBadge('rec');
@@ -2103,38 +2182,74 @@ function autoStop(reason){
 }
 function stopRecording(){
   if(!S.active) return;
+  /* ★★★ الإصلاح الجوهري ★★★
+     نحفظ المدة الآن — قبل إطفاء الحالة — وإلا لأعادت elapsed()
+     صفراً في finalizeRecording فتُرفض كل تسجيلة كـ«فارغة». */
+  S.finalDur=elapsed();
+  /* تصريف آخر بيانات قبل الإيقاف (مهم للتسجيلات القصيرة) */
+  try{ if(S.recorder && S.recorder.state==='recording') S.recorder.requestData(); }catch(e){}
   try{ S.recorder.stop(); }catch(e){}
   S.active=false; S.paused=false;
+  stopBgPainter();
   setStateBadge('idle');
   $('#btnPause').disabled=true;
   $('#btnMark').disabled=true;
   $('#btnPause').querySelector('use').setAttribute('href','#i-pause');
   $('#fileNameInput').disabled=false;
   $('#fileNameInput').value=nextFileName();
+  document.title=TITLE_BASE;
   beep(520,0.18,'sine',0.18);
 }
 async function finalizeRecording(){
-  const blob=new Blob(S.chunks,{type:(S.mimeUsed||'video/webm').split(';')[0]});
-  S.chunks=[];
-  const dur=elapsed();
-  if(blob.size<1000 || dur<0.4){ toast('التسجيلة فارغة جداً ولم تُحفظ.','warn'); return; }
-  const thumb=await makeThumb(blob).catch(()=>'');
-  const rec={
-    id:uid(), name:S.pendingName, blob, thumb,
-    duration:dur, size:blob.size,
-    w:stage.width, h:stage.height, fps:SET.fps,
-    createdAt:Date.now(), markers:[...S.markers],
-    mime:S.mimeUsed,
-  };
+  if(S.finalizing) return;
+  S.finalizing=true;
   try{
-    await dbAdd(rec);
-    S.lib=[rec,...S.lib];
-    toast(`تم حفظ «${rec.name}» — ${fmtTime(dur)} · ${fmtBytes(blob.size)}`,'ok',[
-      {label:'فتح في المحرر', hot:true, fn:()=>{ loadRec(rec.id); setView('editor'); }},
-      {label:'تنزيل', fn:()=>downloadBlob(blob, rec.name+extFor(rec.mime))},
-    ], 8000);
-  }catch(e){
-    toast('تعذر الحفظ في المكتبة: '+e.message,'err');
+    stopBgPainter();
+    /* نقرأ الحالة فوراً (تزامنياً) قبل أي await */
+    const chunks=S.chunks; S.chunks=[];
+    const dur=S.finalDur>0 ? S.finalDur : Math.max(0.5,(performance.now()-S.t0)/1000);
+    const mimeUsed=S.mimeUsed;
+    S.recorder=null; S.recMode=null; updateModeChip();
+
+    const blob=new Blob(chunks,{type:(mimeUsed||'video/webm').split(';')[0]});
+
+    if(blob.size<1000){
+      toast('المسجّل لم ينتج بيانات (0 بايت). سجّل مدة أطول من ثانية وتأكد من Chrome/Edge حديث.','err',null,8000);
+      return;
+    }
+    if(dur<0.5){
+      toast('المقطع أقصر من نصف ثانية — لم يُحفظ.','warn');
+      return;
+    }
+
+    const thumb=await makeThumb(blob).catch(()=>'');
+    const rec={
+      id:uid(), name:S.pendingName, blob, thumb,
+      duration:dur, size:blob.size,
+      w:(S.recModeWas==='canvas'?stage.width:0)||stage.width,
+      h:stage.height, fps:recFps(),
+      createdAt:Date.now(), markers:[...S.markers],
+      mime:mimeUsed,
+    };
+    try{
+      const st=S.lastTrackSettings||{};
+      rec.w=st.width||stage.width;
+      rec.h=st.height||stage.height;
+    }catch(e){}
+
+    try{
+      await dbAdd(rec);
+      S.lib=[rec,...S.lib];
+      toast(`تم حفظ «${rec.name}» — ${fmtTime(dur)} · ${fmtBytes(blob.size)}`,'ok',[
+        {label:'فتح في المحرر', hot:true, fn:()=>{ loadRec(rec.id); setView('editor'); }},
+        {label:'تنزيل', fn:()=>downloadBlob(blob, rec.name+extFor(mimeUsed))},
+      ], 8000);
+    }catch(e){
+      toast('تعذر الحفظ في المكتبة: '+e.message,'err');
+      downloadBlob(blob, S.pendingName+extFor(mimeUsed));   /* لا نفقد البيانات */
+    }
+  } finally {
+    S.finalizing=false;
   }
 }
 async function makeThumb(blob){
@@ -2148,7 +2263,7 @@ async function makeThumb(blob){
       if(settled) return; settled=true;
       try{
         const c=document.createElement('canvas');
-        c.width=240; c.height=135;     /* مصغّرة أصغر = ذاكرة أقل */
+        c.width=240; c.height=135;
         const x=c.getContext('2d');
         x.fillStyle='#000'; x.fillRect(0,0,240,135);
         if(ok&&v.videoWidth){
@@ -2159,7 +2274,7 @@ async function makeThumb(blob){
       }catch(e){ res(''); }
       URL.revokeObjectURL(url);
     };
-    v.onloadeddata=()=>{ v.currentTime=Math.min(0.4,(v.duration||1)/3); };
+    v.onloadeddata=()=>{ v.currentTime=Math.min(0.4,(v.duration&&isFinite(v.duration)?v.duration:1)/3||0.4); };
     v.onseeked=()=>done(true);
     v.onerror=()=>done(false);
     setTimeout(()=>done(false), 3500);
@@ -2175,6 +2290,7 @@ function statsLoop(){
     setTxt('#timerVal', fmtTime(t));
     setTxt('#statSize', fmtBytes(bytes));
     setTxt('#statBitrate', t>1.5 ? (bytes*8/t/1000000).toFixed(1)+' Mbps' : '— Mbps');
+    document.title='● '+fmtTime(t)+' — استوديو التسجيل';
     if(SET.maxDur && t>=SET.maxDur*60) autoStop('بلوغ الحد الزمني');
     if(SET.maxSize && bytes>=SET.maxSize*MB) autoStop('بلوغ حد الحجم');
   },300);
@@ -2200,7 +2316,7 @@ async function renderLibrary(){
   wrap.innerHTML='';
   $('#libEmpty').hidden = S.lib.length>0;
   $('#libFoot').hidden = S.lib.length===0;
-  const frag=document.createDocumentFragment();   /* إدراج واحد بدل N */
+  const frag=document.createDocumentFragment();
   list.forEach(rec=>frag.appendChild(libRow(rec)));
   wrap.appendChild(frag);
   if(S.lib.length){
@@ -2267,7 +2383,7 @@ function libRow(rec){
  $('#libSearch').addEventListener('input',e=>{ S.libSearch=e.target.value.trim(); renderLibrary(); });
  $('#libSort').addEventListener('change',e=>{ S.libSort=e.target.value; renderLibrary(); });
 
-/* ─────────── 16) المحرر — أحداث بدل حلقة rAF ─────────── */
+/* ─────────── 16) المحرر ─────────── */
 const edVideo=$('#edVideo');
 function loadRec(id){
   const rec=S.lib.find(r=>r.id===id);
@@ -2286,15 +2402,35 @@ function loadRec(id){
   setTxt('#edMetaFmt', (rec.mime||'video/webm').replace('video/','').toUpperCase());
   setTxt('#edMetaDate', fmtDate(rec.createdAt));
   setTxt('#edChipRes', `${rec.w}×${rec.h}`);
-  edVideo.onloadedmetadata=()=>{
-    S.editor.duration=edVideo.duration||rec.duration;
+  edVideo.onloadedmetadata=fixAndInitEditorDuration;
+  drawTimeline();
+}
+/* ★ إصلاح مدة WebM اللانهائية (ناتج MediaRecorder):
+   نقفز زمنياً لقيمة ضخمة فيforcing المتصفح لحساب المدة الحقيقية،
+   ثم نعود للصفر — مع سقوطٍ احتياطي إلى المدة المحفوظة. */
+function fixAndInitEditorDuration(){
+  const v=edVideo, rec=S.editor.rec;
+  const finish=()=>{
+    const d=v.duration;
+    S.editor.duration=(isFinite(d)&&d>0)?d:(rec.duration||0);
     S.editor.tB=S.editor.duration;
     setTxt('#edDur', fmtTime(S.editor.duration));
     setTxt('#tlEnd', fmtTime(S.editor.duration));
     setTxt('#tlMid', fmtTime(S.editor.duration/2));
     drawTimeline(); placeTrim(); placeMarks(); updateTrimReadout(); edPaint();
   };
-  drawTimeline();
+  if(isFinite(v.duration)&&v.duration>0){ finish(); return; }
+  let settled=false;
+  const fin=()=>{
+    if(settled) return; settled=true;
+    v.removeEventListener('timeupdate', onT);
+    try{ v.currentTime=0; }catch(e){}
+    setTimeout(finish, 60);
+  };
+  const onT=()=>fin();
+  v.addEventListener('timeupdate', onT);
+  try{ v.currentTime=1e6; }catch(e){ fin(); }
+  setTimeout(fin, 1600);
 }
 function closeEditor(keep){
   if(S.editor){ URL.revokeObjectURL(S.editor.url); }
@@ -2305,7 +2441,6 @@ function closeEditor(keep){
     edVideo.removeAttribute('src'); edVideo.load();
   }
 }
-/* رسم حالة المشغل — يستدعى من الأحداث فقط (timeupdate ≈ 4Hz) */
 function edPaint(){
   if(!S.editor||!S.editor.duration) return;
   const t=edVideo.currentTime;
@@ -2361,7 +2496,7 @@ function drawTimeline(){
   if(!S.editor) return;
   const seed=[...(S.editor.rec.id||'x')].reduce((s,c)=>s+c.charCodeAt(0),0);
   const rnd=seededRand(seed);
-  const n=Math.max(40, Math.floor(w/6));      /* أعمدة أقل = رسم أسرع */
+  const n=Math.max(40, Math.floor(w/6));
   const bw=w/n;
   for(let i=0;i<n;i++){
     const env=0.25+0.75*Math.abs(Math.sin(i/n*Math.PI*2.3+rnd()*0.4));
@@ -2416,7 +2551,7 @@ function wireTrim(handle, key){
     if(!S.editor||!S.editor.duration) return;
     e.preventDefault(); e.stopPropagation();
     handle.setPointerCapture(e.pointerId);
-    const rect=$('#tlBody').getBoundingClientRect();  /* قراءة واحدة قبل السحب */
+    const rect=$('#tlBody').getBoundingClientRect();
     const move=ev=>{
       const t=tlT(ev.clientX-rect.left);
       if(key==='tA') S.editor.tA=clamp(t,0,S.editor.tB-0.2);
@@ -2507,8 +2642,8 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
     const cv=document.createElement('canvas');
     cv.width=v.videoWidth; cv.height=v.videoHeight;
     const cx=cv.getContext('2d');
-    cx.imageSmoothingQuality='low';            /* رسم أسرع على المعالجات الضعيفة */
-    const fpsOut=Math.min(SET.fps,30);         /* سقف 30fps في التصدير لتخفيف الحمل */
+    cx.imageSmoothingQuality='low';
+    const fpsOut=Math.min(recFps(),30);
     const cStream=cv.captureStream(fpsOut);
 
     let audioOk=false;
@@ -2534,9 +2669,8 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
     mr.start(500);
     await v.play();
 
-    /* رسم الإطارات بمؤقّت fpsOut بدل rAF الكامل — رحمة بالمعالج */
     let stop=false;
-    const paint=()=>{ if(stop) return; cx.drawImage(v,0,0); };
+    const paint=()=>{ if(!stop) cx.drawImage(v,0,0); };
     const paintTimer=setInterval(paint, 1000/fpsOut);
 
     await new Promise(res=>{
@@ -2553,7 +2687,7 @@ wireTrim($('#tlHandleA'),'tA'); wireTrim($('#tlHandleB'),'tB');
     stop=true;
     clearInterval(paintTimer);
     v.pause();
-    paint();                       /* إطار أخير */
+    paint();
     await finish();
     URL.revokeObjectURL(v.src);
 
@@ -2625,7 +2759,6 @@ function wireSettings(){
   $('#setCamDev').value=SET.camDev;
   $('#setCamDev').onchange=e=>{ SET.camDev=e.target.value; saveSet(); restartCam(); };
 
-  /* عناصر الاستوديو السريعة */
   $('#selRes').value=SET.res;
   $('#selRes').onchange=e=>{
     SET.res=e.target.value; saveSet();
@@ -2667,7 +2800,7 @@ document.addEventListener('keydown',e=>{
   const typing = e.target.matches('input,select,textarea') || e.target.isContentEditable;
   if(typing) return;
   const k=e.key.toLowerCase();
-  if(k==='r'){ e.preventDefault(); S.active?stopRecording():beginRecording(); }
+  if(k==='r'){ e.preventDefault(); if(!S.countingDown) S.active?stopRecording():beginRecording(); }
   else if(e.key===' '){
     e.preventDefault();
     if(S.active) togglePause();
@@ -2681,7 +2814,7 @@ document.addEventListener('keydown',e=>{
 (async function boot(){
   setStateBadge('idle');
   wireSettings();
-  applyPerf();                 /* كشف الجهاز وتطبيق الوضع المناسب */
+  applyPerf();
   applyTargetRes();
   drawFrame();
   refreshDevices();
@@ -2692,7 +2825,7 @@ document.addEventListener('keydown',e=>{
       {label:'فتح المكتبة', fn:()=>setView('library')},
     ], 5000);
   }catch(e){
-    toast('تعذر فتح قاعدة البيانات المحلية — التسجيلات لن تُحفظ بعد الإيقاف.','err',null,8000);
+    toast('تعذر فتح قاعدة البيانات المحلية — التسجيلات ستُنزَّل مباشرة بعد الإيقاف بدل حفظها.','warn',null,8000);
   }
 })();
 </script>
